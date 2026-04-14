@@ -44,8 +44,9 @@
         #overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 40px 20px; pointer-events: none; }
         #counter { font-size: 160px; font-weight: 900; color: var(--neon); text-shadow: 0 0 40px #000; display: flex; align-items: center; justify-content: center; flex-grow: 1; }
         
-        .back-circle { position: absolute; left: 30px; bottom: 45px; width: 60px; height: 60px; background: rgba(255,255,255,0.1); border: 2px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; pointer-events: auto; }
-        .back-circle svg { width: 30px; height: 30px; fill: white; }
+        .cam-btn { width: 60px; height: 60px; background: rgba(255,255,255,0.1); border: 2px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; pointer-events: auto; }
+        .cam-btn svg { width: 30px; height: 30px; fill: white; }
+        
         .shutter-btn { width: 90px; height: 90px; background: black; border-radius: 50%; border: 5px solid var(--neon); cursor: pointer; pointer-events: auto; box-shadow: 0 0 20px var(--neon); animation: pulse-border 1.5s infinite; }
 
         #flash { position: fixed; inset: 0; background: white; display: none; z-index: 2000; }
@@ -65,9 +66,17 @@
         <div id="overlay">
             <div id="indicator" style="font-size:18px; color:var(--neon); border:1px solid var(--neon); padding:5px 15px; border-radius:20px;">FOTO 1 / 1</div>
             <div id="counter"></div>
-            <div id="cam-controls" style="display:flex; align-items:center; justify-content:center; width:100%; position:relative; min-height:120px;">
-                <div class="back-circle" onclick="voltarHome()"><svg viewBox="0 0 24 24"><path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z" /></svg></div>
+            
+            <div id="cam-controls" style="display:flex; align-items:center; justify-content:space-evenly; width:100%; padding-bottom:30px; pointer-events: auto;">
+                <div class="cam-btn" onclick="voltarHome()">
+                    <svg viewBox="0 0 24 24"><path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z" /></svg>
+                </div>
+
                 <div id="shutter-placeholder"></div>
+
+                <div class="cam-btn" id="flip-btn" onclick="switchCam()">
+                    <svg viewBox="0 0 24 24"><path d="M7,15L11,19V16H14A5,5 0 0,1 19,21H21A7,7 0 0,0 14,14H11V11L7,15M17,9L13,5V8H10A5,5 0 0,0 5,3H3A7,7 0 0,1 10,10H13V13L17,9Z" /></svg>
+                </div>
             </div>
         </div>
     </div>
@@ -90,9 +99,10 @@
 
     <script>
         const API = "https://photoprint-api.maxprimefotovideo.workers.dev";
-        let ev = ""; let frame = ""; let pics = []; let total = 1; let stream = null; let cancelado = false;
+        let ev = ""; let frame = ""; let pics = []; let total = 1; let stream = null; 
+        let cancelado = false;
+        let currentFacingMode = "environment"; 
         
-        // Definições de Formato
         const FORMATOS = {
             TIRINHA: { w: 600, h: 1800, fotos: 3, label: "MODO: TIRINHA (5X15)" },
             POLAROID: { w: 1200, h: 1500, fotos: 1, label: "MODO: POLAROID" },
@@ -116,7 +126,7 @@
                     document.getElementById('nome-evento').innerText = ev;
                     const upperEv = ev.toUpperCase();
                     
-                    // Lógica de Identificação Corrigida
+                    // PRIORIDADE PARA POLAROID
                     if (upperEv.includes("POLAROID")) {
                         currentConfig = FORMATOS.POLAROID;
                     } else if (upperEv.includes("TIRINHA")) {
@@ -127,7 +137,6 @@
 
                     total = currentConfig.fotos;
                     document.getElementById('formato-view').innerText = currentConfig.label;
-                    
                     getFrame(ev);
                 }
             } catch (e) { document.getElementById('offline-screen').style.display = "flex"; }
@@ -142,15 +151,28 @@
             } catch (e) {}
         }
 
+        async function startStream(mode) {
+            if (stream) stream.getTracks().forEach(t => t.stop());
+            stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: mode, width: { ideal: 1920 } } 
+            });
+            document.getElementById('v').srcObject = stream;
+        }
+
         async function ligar() {
             try {
                 pics = []; cancelado = false;
-                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment", width: { ideal: 1920 } } });
-                document.getElementById('v').srcObject = stream;
+                await startStream(currentFacingMode);
                 document.getElementById('cam-container').style.display = "block";
+                document.getElementById('flip-btn').style.visibility = "visible";
                 document.getElementById('shutter-placeholder').innerHTML = '<div onclick="iniciarSequencia()" class="shutter-btn"></div>';
                 document.getElementById('counter').innerText = "";
             } catch (err) { alert("Permita o acesso à câmera."); }
+        }
+
+        async function switchCam() {
+            currentFacingMode = (currentFacingMode === "environment") ? "user" : "environment";
+            await startStream(currentFacingMode);
         }
 
         function voltarHome() {
@@ -161,6 +183,7 @@
 
         async function iniciarSequencia() {
             document.getElementById('shutter-placeholder').innerHTML = ""; 
+            document.getElementById('flip-btn').style.visibility = "hidden"; // Esconde inverter durante a contagem
             go(1);
         }
 
@@ -189,9 +212,16 @@
             const cv = document.getElementById('c-snap');
             cv.width = v.videoWidth; cv.height = v.videoHeight;
             const ctx = cv.getContext('2d');
+            
+            // Espelhamento se usar frontal
+            if (currentFacingMode === "user") {
+                ctx.translate(cv.width, 0);
+                ctx.scale(-1, 1);
+            }
+            
             ctx.drawImage(v, 0, 0);
             const img = new Image();
-            img.src = cv.toDataURL('image/jpeg', 0.9);
+            img.src = cv.toDataURL('image/jpeg', 0.95);
             pics.push(img);
         }
 
@@ -206,10 +236,7 @@
             const m = new Image();
             m.crossOrigin = "anonymous";
             m.onload = () => {
-                // Aplica as medidas exatas que você passou
-                cv.width = currentConfig.w; 
-                cv.height = currentConfig.h;
-
+                cv.width = currentConfig.w; cv.height = currentConfig.h;
                 const hPart = cv.height / total;
                 pics.forEach((img, i) => {
                     const s = Math.max(cv.width / img.width, hPart / img.height);
@@ -217,16 +244,12 @@
                     ctx.beginPath(); ctx.rect(0, i * hPart, cv.width, hPart); ctx.clip();
                     ctx.drawImage(img, (cv.width - img.width * s) / 2, (i * hPart) + (hPart - img.height * s) / 2, img.width * s, img.height * s);
                     ctx.restore();
-                    
                     if (total > 1 && i < total - 1) {
                         ctx.fillStyle = "white"; 
                         ctx.fillRect(0, (i + 1) * hPart - 2, cv.width, 4); 
                     }
                 });
-                
-                // Desenha a moldura (PNG) por cima com o tamanho exato do formato
                 ctx.drawImage(m, 0, 0, cv.width, cv.height);
-
                 const previewUrl = cv.toDataURL('image/jpeg', 0.8);
                 document.getElementById('loader').innerHTML = `
                     <img src="${previewUrl}" style="height:60vh; border:3px solid white;">
