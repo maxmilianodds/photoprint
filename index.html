@@ -70,113 +70,123 @@
     <canvas id="c-strip" style="display:none"></canvas>
 
     <script>
-        const API = "https://photoprint-api.maxprimefotovideo.workers.dev";
-        let ev = ""; let frame = ""; let pics = []; let total = 1; let stream = null;
+    const API = "https://photoprint-api.maxprimefotovideo.workers.dev";
+    let ev = ""; let frame = ""; let pics = []; let total = 1; let stream = null;
 
-        async function sync() {
-            try {
-                const r = await fetch(`${API}/status?t=${Date.now()}`);
-                const d = await r.json();
-                if (ev !== d.evento) {
-                    ev = d.evento;
-                    document.getElementById('nome-evento').innerText = ev;
-                    total = ev.toUpperCase().includes("TIRINHA") ? 3 : 1;
-                    document.getElementById('formato-view').innerText = `MODO: ${total > 1 ? 'TIRINHA AUTO' : 'FOTO ÚNICA'}`;
-                    getFrame(ev);
-                }
-            } catch (e) {}
-        }
-
-        async function getFrame(e) {
-            const r = await fetch(`${API}/list-photos?evento=${encodeURIComponent(e)}`);
-            const f = await r.json();
-            const p = f.find(x => x.key.toLowerCase().endsWith('.png'));
-            if (p) frame = `${API}/photo/${encodeURIComponent(p.key)}`;
-        }
-
-        async function ligar() {
-            try {
-                pics = [];
-                // Tenta abrir a câmera frontal
-                stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { facingMode: "user", width: { ideal: 1280 } } 
-                });
-                document.getElementById('v').srcObject = stream;
-                document.getElementById('cam-container').style.display = "block";
-                go(1);
-            } catch (err) {
-                alert("ERRO: O navegador bloqueou a câmera. No celular, você precisa rodar isso através de um servidor (Ex: App 'Web Server') ou HTTPS.");
+    async function sync() {
+        try {
+            const r = await fetch(`${API}/status?t=${Date.now()}`);
+            const d = await r.json();
+            if (ev !== d.evento) {
+                ev = d.evento;
+                document.getElementById('nome-evento').innerText = ev;
+                total = ev.toUpperCase().includes("TIRINHA") ? 3 : 1;
+                document.getElementById('formato-view').innerText = `MODO: ${total > 1 ? 'TIRINHA AUTO' : 'FOTO ÚNICA'}`;
+                getFrame(ev);
             }
-        }
+        } catch (e) {}
+    }
 
-        async function go(n) {
-            const cDisplay = document.getElementById('counter');
-            document.getElementById('indicator').innerText = `FOTO ${n} / ${total}`;
+    async function getFrame(e) {
+        const r = await fetch(`${API}/list-photos?evento=${encodeURIComponent(e)}`);
+        const f = await r.json();
+        const p = f.find(x => x.key.toLowerCase().endsWith('.png'));
+        if (p) frame = `${API}/photo/${encodeURIComponent(p.key)}`;
+    }
+
+    async function ligar() {
+        try {
+            pics = [];
+            // SUGESTÃO ADICIONADA: Configuração robusta para câmera frontal no celular
+            stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { 
+                    facingMode: "user", // Força câmera de selfie
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                } 
+            });
             
-            for (let i = 3; i > 0; i--) {
-                cDisplay.innerText = i;
-                await new Promise(r => setTimeout(r, 1000));
-            }
+            document.getElementById('v').srcObject = stream;
+            document.getElementById('cam-container').style.display = "block";
             
-            cDisplay.innerText = "";
-            snap();
-
-            if (n < total) {
-                setTimeout(() => go(n + 1), 2000);
-            } else {
-                setTimeout(send, 1000);
-            }
-        }
-
-        function snap() {
-            const f = document.getElementById('flash');
-            f.style.display = "block"; setTimeout(() => f.style.display = "none", 100);
-
-            const v = document.getElementById('v');
-            const cv = document.getElementById('c-snap');
-            cv.width = v.videoWidth; cv.height = v.videoHeight;
-            const ctx = cv.getContext('2d');
-            ctx.translate(cv.width, 0); ctx.scale(-1, 1);
-            ctx.drawImage(v, 0, 0);
+            // Pequeno delay de 1s para o usuário se ver na tela antes da contagem
+            setTimeout(() => go(1), 1000);
             
-            const img = new Image();
-            img.src = cv.toDataURL('image/jpeg', 0.9);
-            pics.push(img);
+        } catch (err) {
+            console.error(err);
+            alert("ERRO: Verifique se o cadeado lá no topo do navegador está com a CÂMERA ATIVADA.");
         }
+    }
 
-        async function send() {
-            if (stream) stream.getTracks().forEach(t => t.stop());
-            document.getElementById('cam-container').style.display = "none";
-            document.getElementById('loader').style.display = "flex";
-
-            const cv = document.getElementById('c-strip');
-            const ctx = cv.getContext('2d');
-            const m = new Image();
-            m.crossOrigin = "anonymous";
-            m.onload = () => {
-                cv.width = m.width; cv.height = m.height;
-                const h = cv.height / total;
-                pics.forEach((img, i) => {
-                    const s = Math.max(cv.width / img.width, h / img.height);
-                    ctx.save();
-                    ctx.beginPath(); ctx.rect(0, i * h, cv.width, h); ctx.clip();
-                    ctx.drawImage(img, (cv.width - img.width * s) / 2, (i * h) + (h - img.height * s) / 2, img.width * s, img.height * s);
-                    ctx.restore();
-                });
-                ctx.drawImage(m, 0, 0);
-                cv.toBlob(async b => {
-                    const fd = new FormData();
-                    fd.append('file', b, 'f.jpg');
-                    fd.append('evento', ev);
-                    await fetch(`${API}/upload`, { method: 'POST', body: fd });
-                    location.reload();
-                }, 'image/jpeg', 0.9);
-            };
-            m.src = frame + "?t=" + Date.now();
+    async function go(n) {
+        const cDisplay = document.getElementById('counter');
+        document.getElementById('indicator').innerText = `FOTO ${n} / ${total}`;
+        
+        for (let i = 3; i > 0; i--) {
+            cDisplay.innerText = i;
+            await new Promise(r => setTimeout(r, 1000));
         }
+        
+        cDisplay.innerText = "";
+        snap();
 
-        setInterval(sync, 5000);
-        sync();
-    </script>
-</body>
-</html>
+        if (n < total) {
+            // Espera 2 segundos entre as fotos para dar tempo de mudar a pose
+            setTimeout(() => go(n + 1), 2000);
+        } else {
+            setTimeout(send, 1000);
+        }
+    }
+
+    function snap() {
+        const f = document.getElementById('flash');
+        f.style.display = "block"; setTimeout(() => f.style.display = "none", 100);
+
+        const v = document.getElementById('v');
+        const cv = document.getElementById('c-snap');
+        cv.width = v.videoWidth; cv.height = v.videoHeight;
+        const ctx = cv.getContext('2d');
+        
+        // Espelhamento corrigido para a foto não sair invertida
+        ctx.translate(cv.width, 0); ctx.scale(-1, 1);
+        ctx.drawImage(v, 0, 0);
+        
+        const img = new Image();
+        img.src = cv.toDataURL('image/jpeg', 0.9);
+        pics.push(img);
+    }
+
+    async function send() {
+        if (stream) stream.getTracks().forEach(t => t.stop());
+        document.getElementById('cam-container').style.display = "none";
+        document.getElementById('loader').style.display = "flex";
+
+        const cv = document.getElementById('c-strip');
+        const ctx = cv.getContext('2d');
+        const m = new Image();
+        m.crossOrigin = "anonymous";
+        m.onload = () => {
+            cv.width = m.width; cv.height = m.height;
+            const h = cv.height / total;
+            pics.forEach((img, i) => {
+                const s = Math.max(cv.width / img.width, h / img.height);
+                ctx.save();
+                ctx.beginPath(); ctx.rect(0, i * h, cv.width, h); ctx.clip();
+                ctx.drawImage(img, (cv.width - img.width * s) / 2, (i * h) + (h - img.height * s) / 2, img.width * s, img.height * s);
+                ctx.restore();
+            });
+            ctx.drawImage(m, 0, 0);
+            cv.toBlob(async b => {
+                const fd = new FormData();
+                fd.append('file', b, 'f.jpg');
+                fd.append('evento', ev);
+                await fetch(`${API}/upload`, { method: 'POST', body: fd });
+                location.reload();
+            }, 'image/jpeg', 0.9);
+        };
+        m.src = frame + "?t=" + Date.now();
+    }
+
+    setInterval(sync, 5000);
+    sync();
+</script>
