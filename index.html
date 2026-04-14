@@ -16,7 +16,7 @@
         #nome-evento { font-size: 26px; font-weight: bold; color: var(--neon); text-transform: uppercase; margin: 5px 0; min-height: 25px; }
         #formato-view { font-size: 15px; color: var(--neon); border: 2px solid var(--neon); padding: 8px 25px; border-radius: 20px; display: inline-block; font-weight: bold; background: rgba(57, 255, 20, 0.1); }
 
-        /* Estilo para espelhar ou não o vídeo */
+        /* Espelhamento para o visor */
         .mirror { transform: scaleX(-1); }
 
         #offline-screen { position: fixed; inset: 0; background: #000; z-index: 10000; display: none; align-items: center; justify-content: center; flex-direction: column; }
@@ -113,16 +113,23 @@
                     document.getElementById('offline-screen').style.display = "none";
                 }
                 
-                // Pega o formato vindo do painel (d.formato ou similar)
-                // Se seu painel enviar d.formato = "POLAROID", ele vai ativar sozinho agora.
-                const formatoRecebido = (d.formato || d.layout || "10X15").toUpperCase();
-
+                // LÓGICA DE DETECÇÃO CORRIGIDA
+                // Primeiro, limpamos o nome para comparar
+                const formatoRecebido = String(d.formato || d.layout || "").toUpperCase().trim();
+                
+                // Só atualiza se o evento mudar OU se o formato selecionado for diferente do atual
                 if (ev !== d.evento || configAtual.label.indexOf(formatoRecebido) === -1) {
                     ev = d.evento;
                     document.getElementById('nome-evento').innerText = ev;
                     
-                    // Se o formato recebido existir no nosso mapa, aplica. Se não, usa 10x15.
-                    configAtual = FORMATOS[formatoRecebido] || FORMATOS["10X15"];
+                    // Verificação rigorosa:
+                    if (formatoRecebido.includes("POLAROID")) {
+                        configAtual = FORMATOS["POLAROID"];
+                    } else if (formatoRecebido.includes("TIRINHA")) {
+                        configAtual = FORMATOS["TIRINHA"];
+                    } else {
+                        configAtual = FORMATOS["10X15"];
+                    }
 
                     total = configAtual.fotos;
                     document.getElementById('formato-view').innerText = configAtual.label;
@@ -148,13 +155,9 @@
             const v = document.getElementById('v');
             v.srcObject = stream;
             
-            // CORREÇÃO DE ESPELHAMENTO:
-            // Se for frontal (user), espelhamos a pré-visualização para o usuário.
-            if (mode === "user") {
-                v.classList.add('mirror');
-            } else {
-                v.classList.remove('mirror');
-            }
+            // Espelhar apenas o visor se for frontal
+            if (mode === "user") v.classList.add('mirror');
+            else v.classList.remove('mirror');
         }
 
         async function ligar() {
@@ -207,7 +210,7 @@
             cv.width = v.videoWidth; cv.height = v.videoHeight;
             const ctx = cv.getContext('2d');
             
-            // No snap, se for frontal, invertemos o desenho para que a foto final fique "correta" (não espelhada)
+            // INVERTE O ESPELHAMENTO NA HORA DO SNAP (Para textos saírem certos)
             if (currentFacingMode === "user") {
                 ctx.translate(cv.width, 0);
                 ctx.scale(-1, 1);
