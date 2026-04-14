@@ -12,11 +12,8 @@
         .brand-title { font-size: 45px; font-weight: 900; color: var(--neon); text-shadow: 0 0 15px var(--neon); letter-spacing: 6px; margin: 0; }
         .subtitle { color: white; font-size: 20px; letter-spacing: 3px; margin-top: 8px; opacity: 0.9; font-weight: 300; }
         
-        .info-container { margin-top: 50px; }
-        #nome-evento { font-size: 26px; font-weight: bold; color: var(--neon); text-transform: uppercase; margin: 5px 0; min-height: 25px; }
-        #formato-view { font-size: 15px; color: var(--neon); border: 2px solid var(--neon); padding: 8px 25px; border-radius: 20px; display: inline-block; font-weight: bold; background: rgba(57, 255, 20, 0.1); }
+        #nome-evento { font-size: 26px; font-weight: bold; color: var(--neon); text-transform: uppercase; margin: 20px 0; min-height: 25px; }
 
-        /* Espelhamento para o visor */
         .mirror { transform: scaleX(-1); }
 
         #offline-screen { position: fixed; inset: 0; background: #000; z-index: 10000; display: none; align-items: center; justify-content: center; flex-direction: column; }
@@ -62,7 +59,7 @@
     <div id="cam-container">
         <video id="v" autoplay playsinline muted></video>
         <div id="overlay">
-            <div id="indicator" style="font-size:18px; color:var(--neon); border:1px solid var(--neon); padding:5px 15px; border-radius:20px;">FOTO 1 / 1</div>
+            <div id="indicator" style="font-size:18px; color:var(--neon); border:1px solid var(--neon); padding:5px 15px; border-radius:20px;">FOTO 1</div>
             <div id="counter"></div>
             <div id="cam-controls" style="display:flex; align-items:center; justify-content:space-evenly; width:100%; padding-bottom:30px; pointer-events: auto;">
                 <div class="cam-btn" onclick="voltarHome()"><svg viewBox="0 0 24 24"><path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z" /></svg></div>
@@ -75,10 +72,7 @@
     <div class="header">
         <h1 class="brand-title">PHOTO PRINT</h1>
         <div class="subtitle">colecionando momentos</div>
-        <div class="info-container">
-            <div id="nome-evento">Sincronizando...</div>
-            <div id="formato-view">---</div>
-        </div>
+        <div id="nome-evento">Sincronizando...</div>
     </div>
 
     <div class="main-ui">
@@ -95,9 +89,9 @@
         let currentFacingMode = "environment"; 
         
         const FORMATOS = {
-            "TIRINHA": { w: 600, h: 1800, fotos: 3, label: "MODO: TIRINHA (5X15)" },
-            "POLAROID": { w: 1200, h: 1500, fotos: 1, label: "MODO: POLAROID" },
-            "10X15": { w: 1800, h: 1200, fotos: 1, label: "MODO: 10X15" }
+            "TIRINHA": { w: 600, h: 1800, fotos: 3 },
+            "POLAROID": { w: 1200, h: 1500, fotos: 1 },
+            "10X15": { w: 1800, h: 1200, fotos: 1 }
         };
         
         let configAtual = FORMATOS["10X15"];
@@ -113,26 +107,17 @@
                     document.getElementById('offline-screen').style.display = "none";
                 }
                 
-                // LÓGICA DE DETECÇÃO CORRIGIDA
-                // Primeiro, limpamos o nome para comparar
-                const formatoRecebido = String(d.formato || d.layout || "").toUpperCase().trim();
+                const f = String(d.formato || d.layout || "").toUpperCase().trim();
                 
-                // Só atualiza se o evento mudar OU se o formato selecionado for diferente do atual
-                if (ev !== d.evento || configAtual.label.indexOf(formatoRecebido) === -1) {
+                if (ev !== d.evento || (f && !configAtual.hasOwnProperty(f))) {
                     ev = d.evento;
                     document.getElementById('nome-evento').innerText = ev;
                     
-                    // Verificação rigorosa:
-                    if (formatoRecebido.includes("POLAROID")) {
-                        configAtual = FORMATOS["POLAROID"];
-                    } else if (formatoRecebido.includes("TIRINHA")) {
-                        configAtual = FORMATOS["TIRINHA"];
-                    } else {
-                        configAtual = FORMATOS["10X15"];
-                    }
+                    if (f.includes("POLAROID")) configAtual = FORMATOS["POLAROID"];
+                    else if (f.includes("TIRINHA")) configAtual = FORMATOS["TIRINHA"];
+                    else configAtual = FORMATOS["10X15"];
 
                     total = configAtual.fotos;
-                    document.getElementById('formato-view').innerText = configAtual.label;
                     getFrame(ev);
                 }
             } catch (e) { document.getElementById('offline-screen').style.display = "flex"; }
@@ -154,8 +139,6 @@
             });
             const v = document.getElementById('v');
             v.srcObject = stream;
-            
-            // Espelhar apenas o visor se for frontal
             if (mode === "user") v.classList.add('mirror');
             else v.classList.remove('mirror');
         }
@@ -209,13 +192,9 @@
             const cv = document.getElementById('c-snap');
             cv.width = v.videoWidth; cv.height = v.videoHeight;
             const ctx = cv.getContext('2d');
-            
-            // INVERTE O ESPELHAMENTO NA HORA DO SNAP (Para textos saírem certos)
             if (currentFacingMode === "user") {
-                ctx.translate(cv.width, 0);
-                ctx.scale(-1, 1);
+                ctx.translate(cv.width, 0); ctx.scale(-1, 1);
             }
-            
             ctx.drawImage(v, 0, 0);
             const img = new Image();
             img.src = cv.toDataURL('image/jpeg', 0.95);
@@ -233,9 +212,7 @@
             const m = new Image();
             m.crossOrigin = "anonymous";
             m.onload = () => {
-                cv.width = configAtual.w; 
-                cv.height = configAtual.h;
-
+                cv.width = configAtual.w; cv.height = configAtual.h;
                 const hPart = cv.height / total;
                 pics.forEach((img, i) => {
                     const s = Math.max(cv.width / img.width, hPart / img.height);
@@ -243,13 +220,11 @@
                     const drawH = img.height * s;
                     const offsetX = (cv.width - drawW) / 2;
                     const offsetY = (i * hPart) + (hPart - drawH) / 2;
-
                     ctx.save();
                     ctx.beginPath(); ctx.rect(0, i * hPart, cv.width, hPart); ctx.clip();
                     ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
                     ctx.restore();
                 });
-
                 ctx.drawImage(m, 0, 0, cv.width, cv.height);
                 const previewUrl = cv.toDataURL('image/jpeg', 0.8);
                 document.getElementById('loader').innerHTML = `
