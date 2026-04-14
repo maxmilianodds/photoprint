@@ -46,7 +46,6 @@
         
         .cam-btn { width: 60px; height: 60px; background: rgba(255,255,255,0.1); border: 2px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; pointer-events: auto; }
         .cam-btn svg { width: 30px; height: 30px; fill: white; }
-        
         .shutter-btn { width: 90px; height: 90px; background: black; border-radius: 50%; border: 5px solid var(--neon); cursor: pointer; pointer-events: auto; box-shadow: 0 0 20px var(--neon); animation: pulse-border 1.5s infinite; }
 
         #flash { position: fixed; inset: 0; background: white; display: none; z-index: 2000; }
@@ -66,7 +65,6 @@
         <div id="overlay">
             <div id="indicator" style="font-size:18px; color:var(--neon); border:1px solid var(--neon); padding:5px 15px; border-radius:20px;">FOTO 1 / 1</div>
             <div id="counter"></div>
-            
             <div id="cam-controls" style="display:flex; align-items:center; justify-content:space-evenly; width:100%; padding-bottom:30px; pointer-events: auto;">
                 <div class="cam-btn" onclick="voltarHome()"><svg viewBox="0 0 24 24"><path d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z" /></svg></div>
                 <div id="shutter-placeholder"></div>
@@ -97,13 +95,14 @@
         let cancelado = false;
         let currentFacingMode = "environment"; 
         
-        // MEDIDAS REAIS PASSADAS POR VOCÊ
+        // MEDIDAS EXATAS QUE VOCÊ QUER
         const FORMATOS = {
             TIRINHA: { w: 600, h: 1800, fotos: 3, label: "MODO: TIRINHA (5X15)" },
             POLAROID: { w: 1200, h: 1500, fotos: 1, label: "MODO: POLAROID" },
             PADRAO: { w: 1800, h: 1200, fotos: 1, label: "MODO: 10X15" }
         };
-        let currentConfig = FORMATOS.PADRAO;
+        
+        let configAtual = FORMATOS.PADRAO;
 
         async function sync() {
             try {
@@ -119,19 +118,19 @@
                 if (ev !== d.evento) {
                     ev = d.evento;
                     document.getElementById('nome-evento').innerText = ev;
-                    const upperEv = ev.toUpperCase();
-                    
-                    // Lógica rigorosa de identificação
-                    if (upperEv.includes("POLAROID")) {
-                        currentConfig = FORMATOS.POLAROID;
-                    } else if (upperEv.includes("TIRINHA")) {
-                        currentConfig = FORMATOS.TIRINHA;
+                    const nomeUpper = ev.toUpperCase();
+
+                    // LÓGICA DE DETECÇÃO CORRIGIDA (Polaroid em primeiro!)
+                    if (nomeUpper.includes("POLAROID")) {
+                        configAtual = FORMATOS.POLAROID;
+                    } else if (nomeUpper.includes("TIRINHA")) {
+                        configAtual = FORMATOS.TIRINHA;
                     } else {
-                        currentConfig = FORMATOS.PADRAO;
+                        configAtual = FORMATOS.PADRAO;
                     }
 
-                    total = currentConfig.fotos;
-                    document.getElementById('formato-view').innerText = currentConfig.label;
+                    total = configAtual.fotos;
+                    document.getElementById('formato-view').innerText = configAtual.label;
                     getFrame(ev);
                 }
             } catch (e) { document.getElementById('offline-screen').style.display = "flex"; }
@@ -149,7 +148,7 @@
         async function startStream(mode) {
             if (stream) stream.getTracks().forEach(t => t.stop());
             stream = await navigator.mediaDevices.getUserMedia({ 
-                video: { facingMode: mode, width: { ideal: 1920 }, height: { ideal: 1080 } } 
+                video: { facingMode: mode, width: { ideal: 1920 } } 
             });
             document.getElementById('v').srcObject = stream;
         }
@@ -161,7 +160,7 @@
                 document.getElementById('cam-container').style.display = "block";
                 document.getElementById('shutter-placeholder').innerHTML = '<div onclick="iniciarSequencia()" class="shutter-btn"></div>';
                 document.getElementById('counter').innerText = "";
-            } catch (err) { alert("Câmera não disponível."); }
+            } catch (err) { alert("Câmera não permitida."); }
         }
 
         async function switchCam() {
@@ -203,17 +202,11 @@
             f.style.display = "block"; setTimeout(() => f.style.display = "none", 100);
             const v = document.getElementById('v');
             const cv = document.getElementById('c-snap');
-            
-            // Captura sempre em alta resolução
-            cv.width = v.videoWidth; 
-            cv.height = v.videoHeight;
+            cv.width = v.videoWidth; cv.height = v.videoHeight;
             const ctx = cv.getContext('2d');
-            
             if (currentFacingMode === "user") {
-                ctx.translate(cv.width, 0);
-                ctx.scale(-1, 1);
+                ctx.translate(cv.width, 0); ctx.scale(-1, 1);
             }
-            
             ctx.drawImage(v, 0, 0);
             const img = new Image();
             img.src = cv.toDataURL('image/jpeg', 0.95);
@@ -230,16 +223,13 @@
             const ctx = cv.getContext('2d');
             const m = new Image();
             m.crossOrigin = "anonymous";
-            
             m.onload = () => {
-                // AQUI ESTÁ A CHAVE: Forçamos o canvas a ter o tamanho do formato escolhido
-                cv.width = currentConfig.w; 
-                cv.height = currentConfig.h;
+                // AQUI ELE APLICA AS MEDIDAS QUE VOCÊ PASSOU
+                cv.width = configAtual.w; 
+                cv.height = configAtual.h;
 
                 const hPart = cv.height / total;
-                
                 pics.forEach((img, i) => {
-                    // Calcula escala para preencher o espaço sem sobrar buraco
                     const s = Math.max(cv.width / img.width, hPart / img.height);
                     const drawW = img.width * s;
                     const drawH = img.height * s;
@@ -247,22 +237,18 @@
                     const offsetY = (i * hPart) + (hPart - drawH) / 2;
 
                     ctx.save();
-                    ctx.beginPath(); 
-                    ctx.rect(0, i * hPart, cv.width, hPart); 
-                    ctx.clip();
+                    ctx.beginPath(); ctx.rect(0, i * hPart, cv.width, hPart); ctx.clip();
                     ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
                     ctx.restore();
                 });
 
-                // Moldura por cima
                 ctx.drawImage(m, 0, 0, cv.width, cv.height);
-
                 const previewUrl = cv.toDataURL('image/jpeg', 0.8);
                 document.getElementById('loader').innerHTML = `
-                    <img src="${previewUrl}" style="max-height:60vh; border:3px solid white; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
+                    <img src="${previewUrl}" style="max-height:60vh; border:3px solid white;">
                     <div style="display:flex; gap:15px; margin-top:15px;">
-                        <button onclick="enviarBlob()" style="padding:15px 30px; background:var(--neon); border:none; font-weight:bold; border-radius:10px; cursor:pointer;">IMPRIMIR</button>
-                        <button onclick="location.reload()" style="padding:15px 30px; background:#444; color:white; border:none; border-radius:10px; cursor:pointer;">REFAZER</button>
+                        <button onclick="enviarBlob()" style="padding:15px 30px; background:var(--neon); border:none; font-weight:bold; border-radius:10px;">IMPRIMIR</button>
+                        <button onclick="location.reload()" style="padding:15px 30px; background:#444; color:white; border:none; border-radius:10px;">REFAZER</button>
                     </div>
                 `;
             };
