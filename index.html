@@ -11,29 +11,27 @@
         .header { margin-top: 30px; z-index: 10; }
         .brand-title { font-size: 45px; font-weight: 900; color: var(--neon); text-shadow: 0 0 15px var(--neon); letter-spacing: 6px; margin: 0; }
         .subtitle { color: white; font-size: 20px; letter-spacing: 3px; margin-top: 8px; opacity: 0.9; font-weight: 300; }
-        
         #nome-evento { font-size: 26px; font-weight: bold; color: var(--neon); text-transform: uppercase; margin: 20px 0; min-height: 25px; }
 
         .mirror { transform: scaleX(-1); }
 
+        /* Tela de Alerta para Girar */
+        #rotate-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 5000; display: none; align-items: center; justify-content: center; flex-direction: column; }
+        .phone-icon { width: 80px; height: 140px; border: 4px solid white; border-radius: 10px; position: relative; animation: rotatePhone 2s infinite ease-in-out; }
+        .phone-icon::after { content: ''; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 10px; height: 10px; border: 2px solid white; border-radius: 50%; }
+        @keyframes rotatePhone { 0% { transform: rotate(0deg); } 50% { transform: rotate(-90deg); } 100% { transform: rotate(-90deg); } }
+        .rotate-txt { color: var(--neon); font-weight: 900; margin-top: 30px; letter-spacing: 2px; }
+
         #offline-screen { position: fixed; inset: 0; background: #000; z-index: 10000; display: none; align-items: center; justify-content: center; flex-direction: column; }
         .mantencao-txt { color: var(--error); font-size: 28px; font-weight: 900; letter-spacing: 2px; animation: pulse-red 0.8s infinite; text-align: center; padding: 20px; }
         
-        @keyframes pulse-red {
-            0% { transform: scale(1); text-shadow: 0 0 0px var(--error); }
-            50% { transform: scale(1.05); text-shadow: 0 0 20px var(--error); }
-            100% { transform: scale(1); text-shadow: 0 0 0px var(--error); }
-        }
+        @keyframes pulse-red { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
         .main-ui { flex-grow: 1; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 250px; }
-        .btn-eye { width: 170px; height: 170px; border-radius: 50%; border: 6px solid #222; background: #000; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 rgba(57, 255, 20, 0.7); animation: pulse-border 2s infinite; }
+        .btn-eye { width: 170px; height: 170px; border-radius: 50%; border: 6px solid #222; background: #000; cursor: pointer; display: flex; align-items: center; justify-content: center; animation: pulse-border 2s infinite; }
         .iris { width: 60px; height: 60px; border-radius: 50%; border: 5px solid var(--neon); box-shadow: 0 0 20px var(--neon); }
         
-        @keyframes pulse-border {
-            0% { box-shadow: 0 0 0 0 rgba(57, 255, 20, 0.7); }
-            70% { box-shadow: 0 0 0 30px rgba(57, 255, 20, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(57, 255, 20, 0); }
-        }
+        @keyframes pulse-border { 0% { box-shadow: 0 0 0 0 rgba(57, 255, 20, 0.7); } 70% { box-shadow: 0 0 0 30px rgba(57, 255, 20, 0); } 100% { box-shadow: 0 0 0 0 rgba(57, 255, 20, 0); } }
 
         #cam-container { position: fixed; inset: 0; background: #000; display: none; z-index: 1000; }
         video { width: 100%; height: 100%; object-fit: cover; }
@@ -42,7 +40,7 @@
         
         .cam-btn { width: 60px; height: 60px; background: rgba(255,255,255,0.1); border: 2px solid white; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; pointer-events: auto; }
         .cam-btn svg { width: 30px; height: 30px; fill: white; }
-        .shutter-btn { width: 90px; height: 90px; background: black; border-radius: 50%; border: 5px solid var(--neon); cursor: pointer; pointer-events: auto; box-shadow: 0 0 20px var(--neon); animation: pulse-border 1.5s infinite; }
+        .shutter-btn { width: 90px; height: 90px; background: black; border-radius: 50%; border: 5px solid var(--neon); cursor: pointer; pointer-events: auto; box-shadow: 0 0 20px var(--neon); }
 
         #flash { position: fixed; inset: 0; background: white; display: none; z-index: 2000; }
         #loader { display: none; position: fixed; inset: 0; background: var(--dark); z-index: 3000; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
@@ -53,6 +51,10 @@
 <body>
 
     <div id="offline-screen"><div class="mantencao-txt">SISTEMA EM MANUTENÇÃO</div></div>
+    <div id="rotate-overlay">
+        <div class="phone-icon"></div>
+        <div class="rotate-txt">GIRE O CELULAR (DEITADO)</div>
+    </div>
     <div id="flash"></div>
     <div id="loader"><div class="spin"></div><p style="color:var(--neon);margin-top:20px;font-weight:900;">PROCESSANDO...</p></div>
 
@@ -85,13 +87,12 @@
     <script>
         const API = "https://photoprint-api.maxprimefotovideo.workers.dev";
         let ev = ""; let frame = ""; let pics = []; let total = 1; let stream = null; 
-        let cancelado = false;
-        let currentFacingMode = "environment"; 
+        let cancelado = false; let currentFacingMode = "environment"; 
         
         const FORMATOS = {
-            "TIRINHA": { w: 600, h: 1800, fotos: 3 },
-            "POLAROID": { w: 1200, h: 1500, fotos: 1 },
-            "10X15": { w: 1800, h: 1200, fotos: 1 }
+            "TIRINHA": { w: 600, h: 1800, fotos: 3, landscape: false },
+            "POLAROID": { w: 1200, h: 1500, fotos: 1, landscape: false },
+            "10X15": { w: 1800, h: 1200, fotos: 1, landscape: true }
         };
         
         let configAtual = FORMATOS["10X15"];
@@ -100,28 +101,35 @@
             try {
                 const r = await fetch(`${API}/status?t=${Date.now()}`);
                 const d = await r.json();
-                
-                if (d.status === "OFFLINE") {
-                    document.getElementById('offline-screen').style.display = "flex";
-                } else {
-                    document.getElementById('offline-screen').style.display = "none";
-                }
+                if (d.status === "OFFLINE") document.getElementById('offline-screen').style.display = "flex";
+                else document.getElementById('offline-screen').style.display = "none";
                 
                 const f = String(d.formato || d.layout || "").toUpperCase().trim();
-                
                 if (ev !== d.evento || (f && f !== configAtual.key)) {
                     ev = d.evento;
                     document.getElementById('nome-evento').innerText = ev;
-                    
                     if (f.includes("POLAROID")) configAtual = {...FORMATOS["POLAROID"], key: "POLAROID"};
                     else if (f.includes("TIRINHA")) configAtual = {...FORMATOS["TIRINHA"], key: "TIRINHA"};
                     else configAtual = {...FORMATOS["10X15"], key: "10X15"};
-
                     total = configAtual.fotos;
                     getFrame(ev);
                 }
             } catch (e) { document.getElementById('offline-screen').style.display = "flex"; }
         }
+
+        function checkOrientation() {
+            if (!configAtual.landscape) {
+                document.getElementById('rotate-overlay').style.display = "none";
+                return;
+            }
+            // Verifica se o celular está deitado (largura maior que altura)
+            if (window.innerWidth < window.innerHeight) {
+                document.getElementById('rotate-overlay').style.display = "flex";
+            } else {
+                document.getElementById('rotate-overlay').style.display = "none";
+            }
+        }
+        window.addEventListener('resize', checkOrientation);
 
         async function getFrame(e) {
             try {
@@ -149,6 +157,7 @@
             document.getElementById('cam-container').style.display = "block";
             document.getElementById('shutter-placeholder').innerHTML = '<div onclick="iniciarSequencia()" class="shutter-btn"></div>';
             document.getElementById('counter').innerText = "";
+            checkOrientation();
         }
 
         async function switchCam() {
@@ -160,6 +169,7 @@
             cancelado = true;
             if (stream) stream.getTracks().forEach(t => t.stop());
             document.getElementById('cam-container').style.display = "none";
+            document.getElementById('rotate-overlay').style.display = "none";
         }
 
         async function iniciarSequencia() {
@@ -192,9 +202,7 @@
             const cv = document.getElementById('c-snap');
             cv.width = v.videoWidth; cv.height = v.videoHeight;
             const ctx = cv.getContext('2d');
-            if (currentFacingMode === "user") {
-                ctx.translate(cv.width, 0); ctx.scale(-1, 1);
-            }
+            if (currentFacingMode === "user") { ctx.translate(cv.width, 0); ctx.scale(-1, 1); }
             ctx.drawImage(v, 0, 0);
             const img = new Image();
             img.src = cv.toDataURL('image/jpeg', 0.95);
@@ -205,6 +213,7 @@
             if (cancelado) return;
             if (stream) stream.getTracks().forEach(t => t.stop());
             document.getElementById('cam-container').style.display = "none";
+            document.getElementById('rotate-overlay').style.display = "none";
             document.getElementById('loader').style.display = "flex";
 
             const cv = document.getElementById('c-strip');
@@ -213,49 +222,22 @@
             m.crossOrigin = "anonymous";
             m.onload = () => {
                 cv.width = configAtual.w; cv.height = configAtual.h;
-                
-                // NOVO CÁLCULO DE ENCAIXE PARA O MODO 10X15 (Vertical para Horizontal)
-                if (configAtual.w === 1800 && configAtual.h === 1200) {
-                    pics.forEach((img, i) => {
-                        // Calcula escala mantendo proporção ("CONTAIN" / Letterbox)
-                        const scale = Math.min(cv.width / img.width, cv.height / img.height);
-                        const drawW = img.width * scale;
-                        const drawH = img.height * scale;
-                        
-                        // Centraliza a foto vertical no canvas horizontal
-                        const offsetX = (cv.width - drawW) / 2;
-                        const offsetY = (cv.height - drawH) / 2;
-
-                        ctx.save();
-                        // Preenche fundo com preto (Letterbox)
-                        ctx.fillStyle = "black";
-                        ctx.fillRect(0, 0, cv.width, cv.height);
-                        // Desenha a foto inteira centralizada
-                        ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
-                        ctx.restore();
-                    });
-                } else {
-                    // Mantém a lógica "cover" para tirinha e polaroid
-                    const hPart = cv.height / total;
-                    pics.forEach((img, i) => {
-                        const s = Math.max(cv.width / img.width, hPart / img.height);
-                        const drawW = img.width * s;
-                        const drawH = img.height * s;
-                        const offsetX = (cv.width - drawW) / 2;
-                        const offsetY = (i * hPart) + (hPart - drawH) / 2;
-                        ctx.save();
-                        ctx.beginPath(); ctx.rect(0, i * hPart, cv.width, hPart); ctx.clip();
-                        ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
-                        ctx.restore();
-                    });
-                }
-
-                // Desenha a moldura por cima de tudo
+                const hPart = cv.height / total;
+                pics.forEach((img, i) => {
+                    const s = Math.max(cv.width / img.width, hPart / img.height);
+                    const drawW = img.width * s;
+                    const drawH = img.height * s;
+                    const offsetX = (cv.width - drawW) / 2;
+                    const offsetY = (i * hPart) + (hPart - drawH) / 2;
+                    ctx.save();
+                    ctx.beginPath(); ctx.rect(0, i * hPart, cv.width, hPart); ctx.clip();
+                    ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
+                    ctx.restore();
+                });
                 ctx.drawImage(m, 0, 0, cv.width, cv.height);
-
                 const previewUrl = cv.toDataURL('image/jpeg', 0.8);
                 document.getElementById('loader').innerHTML = `
-                    <img src="${previewUrl}" style="max-height:60vh; border:3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.5);">
+                    <img src="${previewUrl}" style="max-height:60vh; border:3px solid white;">
                     <div style="display:flex; gap:15px; margin-top:15px;">
                         <button onclick="enviarBlob()" style="padding:15px 30px; background:var(--neon); border:none; font-weight:bold; border-radius:10px;">IMPRIMIR</button>
                         <button onclick="location.reload()" style="padding:15px 30px; background:#444; color:white; border:none; border-radius:10px;">REFAZER</button>
