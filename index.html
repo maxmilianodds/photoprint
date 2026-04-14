@@ -213,32 +213,49 @@
             m.crossOrigin = "anonymous";
             m.onload = () => {
                 cv.width = configAtual.w; cv.height = configAtual.h;
-                const hPart = cv.height / total;
                 
-                pics.forEach((img, i) => {
-                    // CÁLCULO DE ESCALA "COVER" PARA 10X15
-                    const s = Math.max(cv.width / img.width, hPart / img.height);
-                    const drawW = img.width * s;
-                    const drawH = img.height * s;
-                    
-                    // Centraliza a foto no espaço destinado
-                    const offsetX = (cv.width - drawW) / 2;
-                    const offsetY = (i * hPart) + (hPart - drawH) / 2;
+                // NOVO CÁLCULO DE ENCAIXE PARA O MODO 10X15 (Vertical para Horizontal)
+                if (configAtual.w === 1800 && configAtual.h === 1200) {
+                    pics.forEach((img, i) => {
+                        // Calcula escala mantendo proporção ("CONTAIN" / Letterbox)
+                        const scale = Math.min(cv.width / img.width, cv.height / img.height);
+                        const drawW = img.width * scale;
+                        const drawH = img.height * scale;
+                        
+                        // Centraliza a foto vertical no canvas horizontal
+                        const offsetX = (cv.width - drawW) / 2;
+                        const offsetY = (cv.height - drawH) / 2;
 
-                    ctx.save();
-                    ctx.beginPath(); 
-                    ctx.rect(0, i * hPart, cv.width, hPart); 
-                    ctx.clip();
-                    ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
-                    ctx.restore();
-                });
+                        ctx.save();
+                        // Preenche fundo com preto (Letterbox)
+                        ctx.fillStyle = "black";
+                        ctx.fillRect(0, 0, cv.width, cv.height);
+                        // Desenha a foto inteira centralizada
+                        ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
+                        ctx.restore();
+                    });
+                } else {
+                    // Mantém a lógica "cover" para tirinha e polaroid
+                    const hPart = cv.height / total;
+                    pics.forEach((img, i) => {
+                        const s = Math.max(cv.width / img.width, hPart / img.height);
+                        const drawW = img.width * s;
+                        const drawH = img.height * s;
+                        const offsetX = (cv.width - drawW) / 2;
+                        const offsetY = (i * hPart) + (hPart - drawH) / 2;
+                        ctx.save();
+                        ctx.beginPath(); ctx.rect(0, i * hPart, cv.width, hPart); ctx.clip();
+                        ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
+                        ctx.restore();
+                    });
+                }
 
-                // Moldura sempre por cima de tudo
+                // Desenha a moldura por cima de tudo
                 ctx.drawImage(m, 0, 0, cv.width, cv.height);
 
                 const previewUrl = cv.toDataURL('image/jpeg', 0.8);
                 document.getElementById('loader').innerHTML = `
-                    <img src="${previewUrl}" style="max-height:60vh; border:3px solid white;">
+                    <img src="${previewUrl}" style="max-height:60vh; border:3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.5);">
                     <div style="display:flex; gap:15px; margin-top:15px;">
                         <button onclick="enviarBlob()" style="padding:15px 30px; background:var(--neon); border:none; font-weight:bold; border-radius:10px;">IMPRIMIR</button>
                         <button onclick="location.reload()" style="padding:15px 30px; background:#444; color:white; border:none; border-radius:10px;">REFAZER</button>
