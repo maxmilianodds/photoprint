@@ -16,7 +16,6 @@
         body { 
             font-family: 'Segoe UI', sans-serif; 
             background-color: var(--dark); 
-            /* FUNDO DINÂMICO RADIAL */
             background: radial-gradient(circle at 50% -20%, #1a3a12 0%, #000 65%);
             color: white; 
             margin: 0; 
@@ -27,7 +26,6 @@
             overflow: hidden; 
         }
 
-        /* --- TELA INICIAL (SPLASH) --- */
         #tela-inicial { 
             position: fixed; inset: 0; 
             display: flex; align-items: center; justify-content: center; 
@@ -35,13 +33,13 @@
         }
         .splash-header { text-align: center; margin-bottom: 60px; }
         
-        /* ANIMAÇÃO GLITCH NO TÍTULO */
         .splash-brand { 
-            font-size: 100px; font-weight: 900; color: var(--neon); 
+            font-size: clamp(40px, 10vw, 100px); font-weight: 900; color: var(--neon); 
             letter-spacing: 20px; text-transform: uppercase; 
             margin: 0; animation: glitch 3s infinite;
             text-shadow: 0 0 20px var(--neon);
         }
+
         @keyframes glitch {
             0% { transform: skew(0deg); }
             2% { transform: skew(10deg); opacity: 0.8; }
@@ -51,18 +49,15 @@
 
         .splash-subtitle { font-size: 16px; letter-spacing: 10px; color: #444; text-transform: uppercase; margin-top: -10px; }
 
-        /* --- MODAL SENHA --- */
         #modal-senha { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 2000; align-items: center; justify-content: center; }
         .pass-box { background: #0a0a0a; padding: 40px; border-radius: 20px; border: 1px solid var(--neon); text-align: center; width: 320px; box-shadow: 0 0 40px rgba(57, 255, 20, 0.2); }
         .pass-box input { width: 100%; padding: 15px; margin: 20px 0; background: #000; border: 1px solid #222; color: var(--neon); text-align: center; font-size: 28px; border-radius: 10px; outline: none; box-sizing: border-box;}
 
-        /* --- LAYOUT INTERNO --- */
         .top-nav { display: none; justify-content: space-between; align-items: center; padding: 20px 40px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
         .internal-brand { font-size: 32px; font-weight: 900; color: var(--neon); letter-spacing: 5px; margin: 0; text-transform: uppercase; filter: drop-shadow(0 0 10px var(--neon)); }
         
         .main-layout { display: none; grid-template-columns: 1fr 1.2fr; gap: 30px; flex: 1; padding: 30px; min-height: 0; }
         
-        /* CARDS ESTILO VIDRO */
         .card { 
             background: var(--card); 
             backdrop-filter: blur(15px);
@@ -73,7 +68,6 @@
         .card-header { padding: 15px 20px; background: rgba(57, 255, 20, 0.1); color: var(--neon); font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; }
         .card-body { padding: 25px; flex: 1; overflow-y: auto; }
 
-        /* BOTÕES BLADE RUNNER (BARRA LATERAL NEON) */
         .btn-neon-style { 
             background: transparent; border: 1px solid var(--neon); color: white; 
             padding: 12px 25px; border-radius: 4px; font-weight: 900; cursor: pointer; 
@@ -89,7 +83,6 @@
 
         .btn-full { width: 100%; margin-top: 10px; padding: 18px; }
 
-        /* INPUTS ESTILO TERMINAL */
         input[type="text"], select { 
             width: 100%; padding: 12px; background: rgba(0,0,0,0.6); 
             border: 1px solid #222; color: white; border-radius: 4px; 
@@ -97,7 +90,6 @@
         }
         input:focus { border-color: var(--neon); }
 
-        /* LISTA DE EVENTOS */
         .evento-item { 
             background: rgba(255,255,255,0.02); border: 1px solid #111; 
             padding: 15px; border-radius: 8px; display: flex; 
@@ -106,15 +98,22 @@
         }
         .evento-item.ativo { border-left: 4px solid var(--neon); background: rgba(57, 255, 20, 0.08); box-shadow: 0 0 20px rgba(0,0,0,0.4); }
 
-        /* STATUS SWITCH */
-        .status-container { display: flex; align-items: center; gap: 12px; padding: 8px 18px; border-radius: 4px; border: 1px solid #222; }
+        /* CORREÇÃO: SWITCH ARREDONDADO */
+        .status-container { display: flex; align-items: center; gap: 12px; padding: 8px 18px; border-radius: 30px; border: 1px solid #222; transition: 0.3s; }
         .status-container.bg-on { border-color: var(--neon); box-shadow: 0 0 15px rgba(57, 255, 20, 0.2); }
-        .switch-mega { position: relative; display: inline-block; width: 54px; height: 28px; }
+        
+        .switch-mega { position: relative; display: inline-block; width: 60px; height: 30px; }
         .switch-mega input { opacity: 0; width: 0; height: 0; }
-        .slider-mega { position: absolute; cursor: pointer; inset: 0; background: #222; transition: .4s; border-radius: 4px; }
-        .slider-mega:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background: white; transition: .4s; }
+        
+        .slider-mega { 
+            position: absolute; cursor: pointer; inset: 0; background: #222; transition: .4s; border-radius: 30px; 
+        }
+        .slider-mega:before { 
+            position: absolute; content: ""; height: 22px; width: 22px; left: 4px; bottom: 4px; background: white; transition: .4s; border-radius: 50%; 
+        }
+        
         input:checked + .slider-mega { background: var(--neon); }
-        input:checked + .slider-mega:before { transform: translateX(26px); background: #000; }
+        input:checked + .slider-mega:before { transform: translateX(30px); background: #000; }
 
         .custom-file-upload { border: 1px dashed var(--neon); display: inline-block; padding: 12px; cursor: pointer; width: 100%; box-sizing: border-box; text-align: center; border-radius: 4px; color: var(--neon); font-size: 11px; font-weight: bold; margin-top: 5px; }
         .preview-container { width: 100%; height: 100px; border: 1px solid #111; margin-top: 10px; display: flex; align-items: center; justify-content: center; background: #000; }
@@ -178,23 +177,33 @@
 
         <div class="card">
             <div class="card-header">Logs de Atividade</div>
-            <div class="card-body" id="corpo-lista">
-                </div>
+            <div class="card-body" id="corpo-lista"></div>
         </div>
     </div>
 
 <script>
-    // MANTIDA TODA A SUA LÓGICA ORIGINAL ABAIXO
     const API_URL = "https://photoprint-api.maxprimefotovideo.workers.dev";
     const SENHA_MESTRA = "1234";
     let eventos = JSON.parse(localStorage.getItem('eventos_db')) || [];
     let formatos = ["10x15 Standard", "Tirinha 5x15", "Polaroid"];
 
-    function abrirModalSenha() { document.getElementById('modal-senha').style.display = 'flex'; document.getElementById('input-pass').focus(); }
-    function fecharModalSenha() { document.getElementById('modal-senha').style.display = 'none'; document.getElementById('input-pass').value = ''; }
+    function abrirModalSenha() { 
+        document.getElementById('modal-senha').style.display = 'flex'; 
+        document.getElementById('input-pass').focus(); 
+    }
+    
+    function fecharModalSenha() { 
+        document.getElementById('modal-senha').style.display = 'none'; 
+        document.getElementById('input-pass').value = ''; 
+    }
+    
     function confirmarSenha() {
-        if(document.getElementById('input-pass').value === SENHA_MESTRA) { fecharModalSenha(); ativarPainel(); }
-        else alert("Acesso Negado!");
+        if(document.getElementById('input-pass').value === SENHA_MESTRA) { 
+            fecharModalSenha(); 
+            ativarPainel(); 
+        } else {
+            alert("Acesso Negado!");
+        }
     }
 
     function ativarPainel() {
@@ -338,14 +347,16 @@
         document.getElementById('btn-submit').innerText = "Atualizar Cadastro";
     }
 
-    function excluir(i) {
-        if(confirm("Excluir log do evento?")) { 
+    async function excluir(i) {
+        const eventoParaExcluir = eventos[i];
+        if(confirm(`Deseja excluir o evento "${eventoParaExcluir.nome}"?`)) { 
             eventos.splice(i, 1); 
             localStorage.setItem('eventos_db', JSON.stringify(eventos)); 
             renderizarLista(); 
             checarEventoAtivo(); 
         }
     }
+
     document.addEventListener('keydown', e => { if(e.key === "Escape") location.reload(); });
 </script>
 </body>

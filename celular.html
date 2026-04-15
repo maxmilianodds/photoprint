@@ -254,18 +254,32 @@
                         <button class="btn-action" style="background:#333; color:white;" onclick="location.reload()">REFAZER</button>
                     </div>
                 `;
-                setTimeout(() => { window.print(); }, 1000);
             };
             m.src = frame + "?t=" + Date.now();
         }
 
-        function enviarBlob() {
+        async function enviarBlob() {
             document.getElementById('loader').innerHTML = '<div class="spin"></div><p style="color:var(--neon); margin-top:20px;">ENVIANDO...</p>';
+            
             document.getElementById('c-strip').toBlob(async b => {
                 const fd = new FormData();
-                fd.append('file', b, 'foto.jpg'); fd.append('evento', ev);
-                await fetch(`${API}/upload`, { method: 'POST', body: fd });
-                location.reload();
+                // Adicionado campo 'tipo' e nome dinâmico para garantir o upload
+                fd.append('file', b, `foto_${Date.now()}.jpg`); 
+                fd.append('evento', ev);
+                fd.append('tipo', 'foto'); 
+
+                try {
+                    const res = await fetch(`${API}/upload`, { method: 'POST', body: fd });
+                    if(res.ok) {
+                        location.reload();
+                    } else {
+                        alert("Erro ao enviar. Tente novamente.");
+                        location.reload();
+                    }
+                } catch(err) {
+                    alert("Erro de conexão.");
+                    location.reload();
+                }
             }, 'image/jpeg', 0.95);
         }
 
