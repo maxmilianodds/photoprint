@@ -15,7 +15,7 @@
 
         .mirror { transform: scaleX(-1); }
 
-        /* Alerta de Rotação - Só para 10x15 */
+        /* Alerta de Rotação */
         #rotate-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 5000; display: none; align-items: center; justify-content: center; flex-direction: column; }
         .phone-icon { width: 60px; height: 110px; border: 4px solid white; border-radius: 8px; position: relative; animation: rotatePhone 2s infinite ease-in-out; }
         .phone-icon::after { content: ''; position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 8px; height: 8px; border: 2px solid white; border-radius: 50%; }
@@ -82,8 +82,8 @@
         let cancelado = false; let currentFacingMode = "environment"; 
         
         const FORMATOS = {
-            "TIRINHA": { w: 600, h: 1800, fotos: 3, landscape: false, padX: 30, padY: 40, divider: true },
-            "POLAROID": { w: 1200, h: 1500, fotos: 1, landscape: false, padX: 80, padY: 100, divider: false },
+            "TIRINHA": { w: 600, h: 1800, fotos: 3, landscape: false, padX: 0, padY: 2, divider: true },
+            "POLAROID": { w: 1200, h: 1500, fotos: 1, landscape: false, padX: 0, padY: 20, divider: false },
             "10X15": { w: 1800, h: 1200, fotos: 1, landscape: true, padX: 0, padY: 0, divider: false }
         };
         
@@ -105,6 +105,7 @@
                     else configAtual = {...FORMATOS["10X15"], key: "10X15"};
                     total = configAtual.fotos;
                     getFrame(ev);
+                    checkOrientation(); // Re-verifica sempre que o formato muda no sync
                 }
             } catch (e) { document.getElementById('offline-screen').style.display = "flex"; }
         }
@@ -153,6 +154,7 @@
             cancelado = true;
             if (stream) stream.getTracks().forEach(t => t.stop());
             document.getElementById('cam-container').style.display = "none";
+            // Força esconder o overlay ao voltar, independente do formato
             document.getElementById('rotate-overlay').style.display = "none";
         }
 
@@ -164,7 +166,8 @@
         async function go(n) {
             if (cancelado) return;
             document.getElementById('indicator').innerText = `FOTO ${n} / ${total}`;
-            let tempo = (total > 1 && n === 1) ? 7 : 5;
+            // AJUSTE: Agora todos os formatos começam com 5 segundos
+            let tempo = 5; 
             for (let i = tempo; i > 0; i--) {
                 if (cancelado) return;
                 document.getElementById('counter').innerText = i;
@@ -206,7 +209,6 @@
                 cv.width = configAtual.w; cv.height = configAtual.h;
                 const hPart = cv.height / total;
                 
-                // Limpa o canvas
                 ctx.fillStyle = "white";
                 ctx.fillRect(0,0, cv.width, cv.height);
 
@@ -214,7 +216,6 @@
                     const drawAreaW = cv.width - (configAtual.padX * 2);
                     const drawAreaH = hPart - (configAtual.padY * 2);
 
-                    // Escala Cover para preencher a largura/altura definida
                     const s = Math.max(drawAreaW / img.width, drawAreaH / img.height);
                     const w = img.width * s;
                     const h = img.height * s;
@@ -223,21 +224,19 @@
                     const y = (i * hPart) + (hPart - h) / 2;
 
                     ctx.save();
-                    // Clip para não invadir outras fotos
                     ctx.beginPath();
                     ctx.rect(configAtual.padX, (i * hPart) + configAtual.padY, drawAreaW, drawAreaH);
                     ctx.clip();
                     ctx.drawImage(img, x, y, w, h);
                     ctx.restore();
 
-                    // Adiciona linha separadora branca se for Tirinha (exceto na última foto)
+                    // Linha branca fina (2px) entre as fotos
                     if (configAtual.divider && i < total - 1) {
                         ctx.fillStyle = "white";
-                        ctx.fillRect(0, (i + 1) * hPart - 2, cv.width, 4);
+                        ctx.fillRect(0, (i + 1) * hPart - 1, cv.width, 2);
                     }
                 });
                 
-                // Aplica a moldura por cima de tudo
                 ctx.drawImage(m, 0, 0, cv.width, cv.height);
 
                 const previewUrl = cv.toDataURL('image/jpeg', 0.8);
