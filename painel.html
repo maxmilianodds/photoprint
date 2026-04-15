@@ -5,41 +5,119 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PHOTO PRINT - Master Panel</title>
     <style>
-        :root { --neon: #39ff14; --red: #ff3131; --dark: #000000; --card: rgba(10, 10, 10, 0.98); --border: #1a1a1a; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--dark); background-image: linear-gradient(145deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0) 50%); color: white; margin: 0; padding: 20px; height: 100vh; display: flex; flex-direction: column; box-sizing: border-box; overflow: hidden; }
-        #tela-inicial { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 1000; background: #000; flex-direction: column; }
+        :root { 
+            --neon: #39ff14; 
+            --red: #ff3131; 
+            --dark: #000000; 
+            --card: rgba(255, 255, 255, 0.03); 
+            --border: rgba(57, 255, 20, 0.2); 
+        }
+
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: var(--dark); 
+            /* FUNDO DINÂMICO RADIAL */
+            background: radial-gradient(circle at 50% -20%, #1a3a12 0%, #000 65%);
+            color: white; 
+            margin: 0; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            box-sizing: border-box; 
+            overflow: hidden; 
+        }
+
+        /* --- TELA INICIAL (SPLASH) --- */
+        #tela-inicial { 
+            position: fixed; inset: 0; 
+            display: flex; align-items: center; justify-content: center; 
+            z-index: 1000; background: #000; flex-direction: column; 
+        }
         .splash-header { text-align: center; margin-bottom: 60px; }
-        .splash-brand { font-size: 100px; font-weight: 900; color: var(--neon); letter-spacing: 20px; text-transform: uppercase; animation: pulse-neon 2s infinite ease-in-out; margin: 0; }
+        
+        /* ANIMAÇÃO GLITCH NO TÍTULO */
+        .splash-brand { 
+            font-size: 100px; font-weight: 900; color: var(--neon); 
+            letter-spacing: 20px; text-transform: uppercase; 
+            margin: 0; animation: glitch 3s infinite;
+            text-shadow: 0 0 20px var(--neon);
+        }
+        @keyframes glitch {
+            0% { transform: skew(0deg); }
+            2% { transform: skew(10deg); opacity: 0.8; }
+            4% { transform: skew(-10deg); opacity: 1; }
+            6% { transform: skew(0deg); }
+        }
+
         .splash-subtitle { font-size: 16px; letter-spacing: 10px; color: #444; text-transform: uppercase; margin-top: -10px; }
-        @keyframes pulse-neon { 0%, 100% { transform: scale(1); text-shadow: 0 0 20px rgba(57, 255, 20, 0.2); } 50% { transform: scale(1.05); text-shadow: 0 0 50px rgba(57, 255, 20, 0.6); } }
+
+        /* --- MODAL SENHA --- */
         #modal-senha { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 2000; align-items: center; justify-content: center; }
-        .pass-box { background: #0a0a0a; padding: 40px; border-radius: 20px; border: 1px solid var(--neon); text-align: center; width: 320px; }
-        .pass-box input { width: 100%; padding: 15px; margin: 20px 0; background: #000; border: 1px solid #222; color: var(--neon); text-align: center; font-size: 28px; border-radius: 10px; outline: none; }
-        .status-container { display: flex; align-items: center; gap: 12px; padding: 8px 18px; border-radius: 50px; border: 1px solid #222; transition: 0.5s; }
-        .status-container.bg-on { background: rgba(57, 255, 20, 0.1); border-color: var(--neon); box-shadow: 0 0 15px rgba(57, 255, 20, 0.2); }
-        .status-container.bg-off { background: rgba(255, 49, 49, 0.1); border-color: var(--red); }
-        #label-status { font-size: 10px; font-weight: 900; letter-spacing: 2px; }
+        .pass-box { background: #0a0a0a; padding: 40px; border-radius: 20px; border: 1px solid var(--neon); text-align: center; width: 320px; box-shadow: 0 0 40px rgba(57, 255, 20, 0.2); }
+        .pass-box input { width: 100%; padding: 15px; margin: 20px 0; background: #000; border: 1px solid #222; color: var(--neon); text-align: center; font-size: 28px; border-radius: 10px; outline: none; box-sizing: border-box;}
+
+        /* --- LAYOUT INTERNO --- */
+        .top-nav { display: none; justify-content: space-between; align-items: center; padding: 20px 40px; border-bottom: 1px solid var(--border); background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
+        .internal-brand { font-size: 32px; font-weight: 900; color: var(--neon); letter-spacing: 5px; margin: 0; text-transform: uppercase; filter: drop-shadow(0 0 10px var(--neon)); }
+        
+        .main-layout { display: none; grid-template-columns: 1fr 1.2fr; gap: 30px; flex: 1; padding: 30px; min-height: 0; }
+        
+        /* CARDS ESTILO VIDRO */
+        .card { 
+            background: var(--card); 
+            backdrop-filter: blur(15px);
+            border-radius: 15px; 
+            border: 1px solid rgba(255,255,255,0.05); 
+            display: flex; flex-direction: column; overflow: hidden; 
+        }
+        .card-header { padding: 15px 20px; background: rgba(57, 255, 20, 0.1); color: var(--neon); font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; }
+        .card-body { padding: 25px; flex: 1; overflow-y: auto; }
+
+        /* BOTÕES BLADE RUNNER (BARRA LATERAL NEON) */
+        .btn-neon-style { 
+            background: transparent; border: 1px solid var(--neon); color: white; 
+            padding: 12px 25px; border-radius: 4px; font-weight: 900; cursor: pointer; 
+            text-transform: uppercase; letter-spacing: 2px; transition: 0.3s;
+            position: relative; border-left: 5px solid var(--neon);
+        }
+        .btn-neon-style:hover { 
+            background: rgba(57, 255, 20, 0.1); 
+            transform: translateX(8px); 
+            box-shadow: -5px 0 20px rgba(57, 255, 20, 0.4);
+            color: var(--neon);
+        }
+
+        .btn-full { width: 100%; margin-top: 10px; padding: 18px; }
+
+        /* INPUTS ESTILO TERMINAL */
+        input[type="text"], select { 
+            width: 100%; padding: 12px; background: rgba(0,0,0,0.6); 
+            border: 1px solid #222; color: white; border-radius: 4px; 
+            margin-top: 5px; outline: none; box-sizing: border-box;
+        }
+        input:focus { border-color: var(--neon); }
+
+        /* LISTA DE EVENTOS */
+        .evento-item { 
+            background: rgba(255,255,255,0.02); border: 1px solid #111; 
+            padding: 15px; border-radius: 8px; display: flex; 
+            justify-content: space-between; align-items: center; margin-bottom: 10px; 
+            transition: 0.3s;
+        }
+        .evento-item.ativo { border-left: 4px solid var(--neon); background: rgba(57, 255, 20, 0.08); box-shadow: 0 0 20px rgba(0,0,0,0.4); }
+
+        /* STATUS SWITCH */
+        .status-container { display: flex; align-items: center; gap: 12px; padding: 8px 18px; border-radius: 4px; border: 1px solid #222; }
+        .status-container.bg-on { border-color: var(--neon); box-shadow: 0 0 15px rgba(57, 255, 20, 0.2); }
         .switch-mega { position: relative; display: inline-block; width: 54px; height: 28px; }
         .switch-mega input { opacity: 0; width: 0; height: 0; }
-        .slider-mega { position: absolute; cursor: pointer; inset: 0; background: #333; transition: .4s; border-radius: 34px; }
-        .slider-mega:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background: white; transition: .4s; border-radius: 50%; }
+        .slider-mega { position: absolute; cursor: pointer; inset: 0; background: #222; transition: .4s; border-radius: 4px; }
+        .slider-mega:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background: white; transition: .4s; }
         input:checked + .slider-mega { background: var(--neon); }
-        input:checked + .slider-mega:before { transform: translateX(26px); }
-        .internal-brand { font-size: 48px; font-weight: 900; color: var(--neon); letter-spacing: 5px; margin: 0; line-height: 1; text-transform: uppercase; }
-        .internal-subtitle { font-size: 11px; letter-spacing: 4px; color: #444; text-transform: uppercase; margin-top: 5px; font-weight: bold; }
-        .btn-neon-style { background: transparent; border: 1px solid var(--neon); color: white; padding: 12px 25px; border-radius: 50px; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; }
-        .btn-neon-style:hover { background: var(--neon); color: black; box-shadow: 0 0 20px var(--neon); }
-        .btn-full { width: 100%; margin-top: 10px; border-radius: 8px; padding: 18px; }
-        .custom-file-upload { border: 1px solid #222; display: inline-block; padding: 12px; cursor: pointer; width: 100%; box-sizing: border-box; text-align: center; border-radius: 6px; background: #050505; color: #555; font-size: 11px; font-weight: bold; }
-        .preview-container { width: 100%; height: 120px; border: 1px dashed #222; margin-top: 10px; display: flex; align-items: center; justify-content: center; border-radius: 8px; background: #050505; overflow: hidden; }
-        #img-preview { max-width: 100%; max-height: 100%; display: none; }
-        .top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #111; padding-bottom: 15px; display: none; }
-        .main-layout { display: grid; grid-template-columns: 1fr 1.2fr; gap: 25px; flex: 1; min-height: 0; display: none; }
-        .card { background: var(--card); border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
-        .card-header { padding: 15px 20px; background: #080808; border-bottom: 1px solid #111; color: var(--neon); font-size: 11px; font-weight: 900; text-transform: uppercase; }
-        .card-body { padding: 25px; flex: 1; overflow-y: auto; }
-        .evento-item { background: #050505; border: 1px solid #111; padding: 15px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .evento-item.ativo { border-left: 4px solid var(--neon); background: rgba(57, 255, 20, 0.05); }
+        input:checked + .slider-mega:before { transform: translateX(26px); background: #000; }
+
+        .custom-file-upload { border: 1px dashed var(--neon); display: inline-block; padding: 12px; cursor: pointer; width: 100%; box-sizing: border-box; text-align: center; border-radius: 4px; color: var(--neon); font-size: 11px; font-weight: bold; margin-top: 5px; }
+        .preview-container { width: 100%; height: 100px; border: 1px solid #111; margin-top: 10px; display: flex; align-items: center; justify-content: center; background: #000; }
     </style>
 </head>
 <body>
@@ -49,25 +127,25 @@
             <h1 class="splash-brand">PHOTO PRINT</h1>
             <p class="splash-subtitle">Colecionando Momentos</p>
         </div>
-        <button class="btn-neon-style" style="padding: 25px 80px;" onclick="abrirModalSenha()">Acessar Painel</button>
+        <button class="btn-neon-style" style="padding: 25px 80px;" onclick="abrirModalSenha()">Acessar Terminal</button>
     </div>
 
     <div id="modal-senha">
         <div class="pass-box">
-            <div style="font-size: 10px; font-weight: 900; color: var(--neon);">IDENTIFICAÇÃO REQUERIDA</div>
+            <div style="font-size: 10px; font-weight: 900; color: var(--neon); letter-spacing: 2px;">AUTENTICAÇÃO NECESSÁRIA</div>
             <input type="password" id="input-pass" placeholder="****" maxlength="4" onkeydown="if(event.key === 'Enter') confirmarSenha()">
-            <button class="btn-neon-style" style="width:100%" onclick="confirmarSenha()">ENTRAR</button>
-            <div style="margin-top: 20px; color: #333; font-size: 10px; cursor: pointer;" onclick="fecharModalSenha()">CANCELAR</div>
+            <button class="btn-neon-style" style="width:100%" onclick="confirmarSenha()">Confirmar</button>
+            <div style="margin-top: 20px; color: #444; font-size: 10px; cursor: pointer;" onclick="fecharModalSenha()">ABORTAR</div>
         </div>
     </div>
 
     <div class="top-nav" id="header">
         <div>
             <h2 class="internal-brand">PHOTO PRINT</h2>
-            <div class="internal-subtitle">colecionando momentos</div>
+            <div style="font-size: 9px; letter-spacing: 3px; color: #555; text-transform: uppercase; font-weight: bold;">Master Control Panel</div>
         </div>
         <div class="status-container bg-off" id="status-box">
-            <span id="label-status" style="color: var(--red);">OFFLINE</span>
+            <span id="label-status" style="font-size: 10px; font-weight: 900; letter-spacing: 2px; color: var(--red);">OFFLINE</span>
             <label class="switch-mega">
                 <input type="checkbox" id="server-status" onchange="salvarStatusRede()">
                 <span class="slider-mega"></span>
@@ -77,33 +155,36 @@
 
     <div class="main-layout" id="layout">
         <div class="card">
-            <div class="card-header">Configuração</div>
+            <div class="card-header">Diretrizes do Evento</div>
             <div class="card-body">
                 <input type="hidden" id="edit-index" value="-1">
-                <div style="margin-bottom: 15px;">
-                    <label style="font-size:10px; color:#555; font-weight:bold; text-transform:uppercase;">Nome do Evento</label>
-                    <input type="text" id="input-evento" style="width:100%; padding:12px; background:#000; border:1px solid #151515; color:white; border-radius:6px; margin-top:5px; outline: none;">
+                <div style="margin-bottom: 20px;">
+                    <label style="font-size:10px; color:var(--neon); font-weight:bold; text-transform:uppercase;">Identificação</label>
+                    <input type="text" id="input-evento" placeholder="Nome do Evento">
                 </div>
-                <div style="margin-bottom: 15px;">
-                    <label style="font-size:10px; color:#555; font-weight:bold;">FORMATO</label>
-                    <select id="select-formato" style="width:100%; padding:12px; background:#000; border:1px solid #151515; color:white; border-radius:6px; margin-top:5px; outline: none;"></select>
+                <div style="margin-bottom: 20px;">
+                    <label style="font-size:10px; color:var(--neon); font-weight:bold;">CONFIGURAÇÃO DE SAÍDA</label>
+                    <select id="select-formato"></select>
                 </div>
-                <div style="margin-bottom: 15px;">
-                    <label style="font-size:10px; color:#555; font-weight:bold;">MOLDURA PNG</label>
-                    <label for="input-moldura" class="custom-file-upload" style="margin-top:5px;">ESCOLHER ARQUIVO</label>
+                <div style="margin-bottom: 20px;">
+                    <label style="font-size:10px; color:var(--neon); font-weight:bold;">MOLDURA (.PNG)</label>
+                    <label for="input-moldura" class="custom-file-upload">CARREGAR LAYER</label>
                     <input type="file" id="input-moldura" accept="image/png" style="display:none" onchange="previewMoldura(this)">
-                    <div class="preview-container"><img id="img-preview" src=""></div>
+                    <div class="preview-container"><img id="img-preview" style="max-width:100%; max-height:100%; display:none;"></div>
                 </div>
-                <button class="btn-neon-style btn-full" onclick="salvarEvento()" id="btn-submit">Sincronizar e Ativar</button>
+                <button class="btn-neon-style btn-full" onclick="salvarEvento()" id="btn-submit">Sincronizar Protocolo</button>
             </div>
         </div>
+
         <div class="card">
-            <div class="card-header">Histórico Local</div>
-            <div class="card-body" id="corpo-lista"></div>
+            <div class="card-header">Logs de Atividade</div>
+            <div class="card-body" id="corpo-lista">
+                </div>
         </div>
     </div>
 
 <script>
+    // MANTIDA TODA A SUA LÓGICA ORIGINAL ABAIXO
     const API_URL = "https://photoprint-api.maxprimefotovideo.workers.dev";
     const SENHA_MESTRA = "1234";
     let eventos = JSON.parse(localStorage.getItem('eventos_db')) || [];
@@ -113,7 +194,7 @@
     function fecharModalSenha() { document.getElementById('modal-senha').style.display = 'none'; document.getElementById('input-pass').value = ''; }
     function confirmarSenha() {
         if(document.getElementById('input-pass').value === SENHA_MESTRA) { fecharModalSenha(); ativarPainel(); }
-        else alert("Senha Incorreta!");
+        else alert("Acesso Negado!");
     }
 
     function ativarPainel() {
@@ -151,7 +232,7 @@
     }
 
     async function ativarEvento(index) {
-        if(confirm(`Ativar galeria para: ${eventos[index].nome}?`)) {
+        if(confirm(`Ativar sistema para: ${eventos[index].nome}?`)) {
             eventos.forEach((e, i) => e.ativo = (i === index));
             localStorage.setItem('eventos_db', JSON.stringify(eventos));
             await sincronizar(eventos[index].nome, eventos[index].formato);
@@ -173,20 +254,17 @@
 
         localStorage.setItem('eventos_db', JSON.stringify(eventos));
 
-        // ENVIO DA MOLDURA SE EXISTIR
         if (molduraFile) {
             const formData = new FormData();
             formData.append('file', molduraFile);
             formData.append('evento', nome);
-            formData.append('tipo', 'moldura'); // CARIMBO DA MOLDURA
-            try {
-                await fetch(`${API_URL}/upload`, { method: 'POST', body: formData });
-            } catch(e) { console.error("Erro ao subir moldura", e); }
+            formData.append('tipo', 'moldura');
+            try { await fetch(`${API_URL}/upload`, { method: 'POST', body: formData }); } catch(e) { console.error(e); }
         }
 
         await sincronizar(nome, formato);
         document.getElementById('edit-index').value = "-1";
-        document.getElementById('btn-submit').innerText = "Sincronizar e Ativar";
+        document.getElementById('btn-submit').innerText = "Sincronizar Protocolo";
         document.getElementById('input-evento').value = "";
         document.getElementById('input-moldura').value = "";
         document.getElementById('img-preview').style.display = "none";
@@ -217,7 +295,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ evento, status, formato })
             });
-        } catch(e) { console.error("Erro na sincronização:", e); }
+        } catch(e) { console.error(e); }
     }
 
     function atualizarUIStatus(on) {
@@ -239,14 +317,14 @@
         corpo.innerHTML = eventos.map((ev, i) => `
             <div class="evento-item ${ev.ativo ? 'ativo' : ''}">
                 <div>
-                    <div style="font-size:12px; font-weight:bold;">${ev.nome}</div>
-                    <div style="font-size:9px; color:#444;">${ev.data} • ${ev.formato}</div>
+                    <div style="font-size:12px; font-weight:900; letter-spacing:1px;">${ev.nome}</div>
+                    <div style="font-size:9px; color:#555; text-transform:uppercase;">${ev.data} • ${ev.formato}</div>
                 </div>
-                <div style="display:flex; gap:12px; align-items:center;">
-                    <span style="cursor:pointer;" onclick="editar(${i})">✏️</span>
-                    <button class="btn-neon-style" style="font-size:9px; padding: 5px 12px; border-radius:4px; ${ev.ativo ? 'background:var(--neon); color:black;' : ''}" 
+                <div style="display:flex; gap:15px; align-items:center;">
+                    <span style="cursor:pointer; font-size:12px;" onclick="editar(${i})">EDITAR</span>
+                    <button class="btn-neon-style" style="font-size:9px; padding: 6px 15px; ${ev.ativo ? 'background:var(--neon); color:black;' : ''}" 
                             onclick="ativarEvento(${i})">${ev.ativo ? 'ATIVO' : 'ATIVAR'}</button>
-                    <span style="cursor:pointer; opacity:0.3;" onclick="excluir(${i})">🗑️</span>
+                    <span style="cursor:pointer; opacity:0.2;" onclick="excluir(${i})">DEL</span>
                 </div>
             </div>
         `).join('');
@@ -261,7 +339,7 @@
     }
 
     function excluir(i) {
-        if(confirm("Excluir evento?")) { 
+        if(confirm("Excluir log do evento?")) { 
             eventos.splice(i, 1); 
             localStorage.setItem('eventos_db', JSON.stringify(eventos)); 
             renderizarLista(); 

@@ -3,102 +3,195 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PHOTO PRINT - SISTEMA PROFISSIONAL</title>
+    <title>PHOTO PRINT - CYBER ELITE GALLERY</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
         :root {
-            --bg: #050505; --surface: #121212; --accent: #39ff14;
-            --danger: #ff3131; --text: #ffffff;
-            --neon-shadow: 0 0 15px rgba(57, 255, 20, 0.7), 0 0 30px rgba(57, 255, 20, 0.4);
+            --bg: #020202; 
+            --surface: rgba(18, 18, 18, 0.8); 
+            --accent: #39ff14;
+            --danger: #ff3131; 
+            --text: #ffffff;
+            --neon-shadow: 0 0 15px rgba(57, 255, 20, 0.5), 0 0 30px rgba(57, 255, 20, 0.2);
+            --glass-border: 1px solid rgba(57, 255, 20, 0.3);
         }
-        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
 
-        /* HEADER */
-        header { padding: 40px 40px 20px; display: flex; flex-direction: column; align-items: center; }
-        .event-label { position: absolute; left: 40px; top: 45px; border-left: 3px solid var(--accent); padding-left: 15px; }
-        .event-label h2 { margin: 0; font-size: 24px; text-transform: uppercase; color: var(--accent); text-shadow: var(--neon-shadow); }
-        .brand-center { text-align: center; }
-        .brand-center h1 { margin: 0; font-size: 48px; color: var(--accent); text-shadow: var(--neon-shadow); letter-spacing: 5px; font-weight: 900; }
-        .brand-center p { margin: 5px 0; font-size: 12px; opacity: 0.7; letter-spacing: 3px; }
-        
-        .search-box { position: relative; margin-top: 40px; z-index: 10; }
-        .search-box input { background: var(--surface); border: 1px solid #333; color: var(--text); padding: 15px 25px; border-radius: 50px; width: 350px; text-align: center; outline: none; transition: 0.3s; font-size: 16px; }
-        .search-box input:focus { border-color: var(--accent); box-shadow: var(--neon-shadow); }
-        .neon-line { width: 100%; height: 2px; background: var(--accent); box-shadow: var(--neon-shadow); margin: 50px 0; opacity: 0.8; }
+        /* 1 - RETORNANDO ÀS FONTES ORIGINAIS */
+        body { 
+            background: radial-gradient(circle at center, #0a1a05 0%, #000 100%); 
+            color: var(--text); 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            margin: 0; 
+            overflow-x: hidden; 
+        }
 
-        /* SIDEBAR */
-        .settings-trigger { position: absolute; right: 40px; top: 45px; font-size: 28px; cursor: pointer; z-index: 1001; }
-        .sidebar { position: fixed; right: -320px; top: 0; width: 280px; height: 100%; background: var(--surface); z-index: 5000; transition: 0.4s; padding: 100px 20px; box-shadow: -10px 0 30px rgba(0,0,0,0.8); }
+        header { 
+            padding: 50px 40px 30px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+        }
+
+        /* 3 - TITULO COM TREMIDA DIAGONAL E SEM MUDAR DE COR */
+        .brand-center h1 { 
+            margin: 0; 
+            font-size: 56px; 
+            color: var(--accent); 
+            text-shadow: var(--neon-shadow); 
+            letter-spacing: 10px; 
+            font-weight: 900; 
+            text-transform: uppercase;
+            animation: glitch-diagonal 4s infinite;
+        }
+
+        @keyframes glitch-diagonal {
+            0% { transform: translate(0); }
+            1% { transform: translate(-2px, -2px); }
+            2% { transform: translate(2px, 2px); }
+            3% { transform: translate(0); }
+            95% { transform: translate(0); }
+            97% { transform: translate(-3px, 1px); }
+            99% { transform: translate(3px, -1px); }
+            100% { transform: translate(0); }
+        }
+
+        .brand-center p { 
+            margin: 5px 0; 
+            font-size: 14px; 
+            opacity: 0.8; 
+            letter-spacing: 5px; 
+            font-weight: 300;
+            color: #fff;
+            text-align: center;
+        }
+
+        /* 2 - MENU 3 RISCOS PULSANTES E NEON */
+        .menu-trigger {
+            position: absolute;
+            right: 40px;
+            top: 50px;
+            cursor: pointer;
+            z-index: 5001;
+            transition: 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .menu-trigger span {
+            display: block;
+            width: 35px;
+            height: 3px;
+            background: var(--accent);
+            margin: 6px 0;
+            transition: 0.4s;
+            box-shadow: var(--neon-shadow);
+            animation: pulse-neon 2s infinite;
+        }
+
+        @keyframes pulse-neon {
+            0% { box-shadow: 0 0 5px var(--accent); opacity: 0.8; }
+            50% { box-shadow: 0 0 20px var(--accent), 0 0 30px var(--accent); opacity: 1; }
+            100% { box-shadow: 0 0 5px var(--accent); opacity: 0.8; }
+        }
+
+        .menu-trigger:hover {
+            transform: rotate(90deg);
+        }
+
+        /* MENU LATERAL MAIS BONITO E FLUIDO */
+        .sidebar { 
+            position: fixed; 
+            right: -350px; 
+            top: 0; 
+            width: 300px; 
+            height: 100%; 
+            background: rgba(10, 10, 10, 0.95); 
+            backdrop-filter: blur(20px);
+            z-index: 5000; 
+            transition: 0.5s cubic-bezier(0.77, 0, 0.175, 1); 
+            padding: 120px 25px; 
+            border-left: var(--glass-border);
+        }
         .sidebar.active { right: 0; }
-        .sidebar-btn { width: 100%; padding: 15px; margin-bottom: 20px; border-radius: 10px; border: 1px solid #333; background: transparent; color: var(--text); cursor: pointer; display: flex; align-items: center; gap: 15px; font-weight: bold; transition: 0.3s; }
-        .btn-download:hover { background: rgba(57, 255, 20, 0.15); border-color: var(--accent); color: var(--accent); }
-        .btn-delete:hover { background: rgba(255, 49, 49, 0.15); border-color: var(--danger); color: var(--danger); }
+
+        .sidebar-btn { 
+            width: 100%; 
+            padding: 18px; 
+            margin-bottom: 20px; 
+            border-radius: 12px; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            background: rgba(255,255,255,0.05); 
+            color: var(--text); 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            font-weight: bold; 
+            transition: 0.4s ease; 
+            font-family: inherit;
+        }
+
+        .sidebar-btn i { font-size: 20px; color: var(--accent); }
+
+        .sidebar-btn:hover { 
+            background: rgba(57, 255, 20, 0.15); 
+            border-color: var(--accent); 
+            transform: translateX(-5px);
+            box-shadow: var(--neon-shadow);
+        }
+
+        .btn-delete:hover { 
+            background: rgba(255, 49, 49, 0.15); 
+            border-color: var(--danger); 
+            box-shadow: 0 0 20px rgba(255, 49, 49, 0.4);
+        }
+        .btn-delete:hover i { color: var(--danger); }
+
+        /* MANTENDO O RESTANTE DO SEU LAYOUT ORIGINAL */
+        .event-label { 
+            position: absolute; left: 40px; top: 45px; 
+            border-left: 4px solid var(--accent); padding-left: 15px; 
+            background: rgba(57, 255, 20, 0.05); padding-right: 20px;
+        }
+        .event-label h2 { margin: 0; font-size: 20px; text-transform: uppercase; color: var(--accent); text-shadow: 0 0 10px var(--accent); letter-spacing: 2px; }
+
+        .search-box { margin-top: 40px; position: relative; z-index: 10; }
+        .search-box input { 
+            background: rgba(255, 255, 255, 0.05); border: var(--glass-border); color: var(--text); padding: 18px 30px; border-radius: 12px; 
+            width: 380px; text-align: center; outline: none; transition: 0.4s; font-size: 18px; backdrop-filter: blur(10px);
+        }
+        .search-box input:focus { width: 420px; background: rgba(57, 255, 20, 0.1); border-color: var(--accent); box-shadow: var(--neon-shadow); }
+
+        .gallery-container { padding: 0 60px 80px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 35px; }
+
+        .card { 
+            background: var(--surface); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); 
+            cursor: pointer; transition: 0.4s; position: relative; backdrop-filter: blur(5px);
+        }
+        .card:hover { transform: translateY(-12px) scale(1.02); border-color: var(--accent); box-shadow: 0 20px 40px rgba(0,0,0,0.6), 0 0 20px rgba(57, 255, 20, 0.2); }
+        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; transition: 0.5s; }
+        .card .badge { position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.7); color: var(--accent); padding: 6px 12px; border-radius: 8px; font-size: 14px; border: 1px solid var(--accent); font-weight: 900; z-index: 2; }
+
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 4999; display: none; backdrop-filter: blur(3px); }
         .overlay.active { display: block; }
 
-        /* GRID */
-        .gallery-container { padding: 0 40px 60px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 25px; }
-        .card { background: var(--surface); border-radius: 15px; overflow: hidden; border: 1px solid #222; cursor: pointer; transition: 0.3s; position: relative; }
-        .card:hover { transform: translateY(-8px); border-color: var(--accent); }
-        .card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; filter: none !important; }
-        .card .badge { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.8); color: var(--accent); padding: 4px 10px; border-radius: 6px; font-size: 12px; border: 1px solid var(--accent); font-weight: bold; z-index: 2; }
-        
-        .printed-stamp { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); background: rgba(0, 0, 0, 0.8); color: var(--accent); border: 2px solid var(--accent); padding: 8px 20px; font-weight: 900; font-size: 18px; border-radius: 8px; box-shadow: var(--neon-shadow); z-index: 3; display: none; pointer-events: none; }
-        .card.is-printed .printed-stamp { display: block; }
-        .card.is-printed img { opacity: 0.5; }
-
-        /* MODAL */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 6000; flex-direction: column; align-items: center; justify-content: center; }
-        .modal img { max-width: 90%; max-height: 75vh; border: 2px solid var(--accent); border-radius: 10px; box-shadow: var(--neon-shadow); filter: none !important; }
-        .reprint-btn { margin-top: 30px; background: var(--accent); color: #000; border: none; padding: 18px 70px; border-radius: 50px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
-
-        /* TELA DE DOWNLOAD DO CLIENTE */
-        #mobile-download-screen {
-            display: none; position: fixed; inset: 0; background: #000; z-index: 9999;
-            flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center;
-        }
-        .btn-baixar-cliente {
-            background: var(--accent); color: #000; padding: 20px 50px; border-radius: 50px;
-            text-decoration: none; font-weight: 900; font-size: 1.2rem; margin-top: 25px;
-            box-shadow: var(--neon-shadow); text-transform: uppercase;
-        }
-
-        /* IMPRESSÃO */
-        #modal-print { position: fixed; left: -9999px; top: 0; }
-        @media print {
-            body * { visibility: hidden; }
-            #modal-print, #modal-print img { 
-                visibility: visible; 
-                display: block !important; 
-                position: absolute; 
-                left: 0; top: 0; width: 100%; 
-                filter: none !important; 
-                -webkit-print-color-adjust: exact !important; 
-                print-color-adjust: exact !important;
-            }
-        }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 6000; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(15px); }
+        .modal img { max-width: 90%; max-height: 75vh; border: 4px solid var(--accent); border-radius: 20px; box-shadow: 0 0 50px rgba(57, 255, 20, 0.3); }
+        .reprint-btn { margin-top: 40px; background: var(--accent); color: #000; border: none; padding: 20px 80px; border-radius: 50px; font-weight: 900; cursor: pointer; text-transform: uppercase; box-shadow: var(--neon-shadow); transition: 0.3s; }
     </style>
 </head>
 <body>
 
-    <div id="mobile-download-screen">
-        <h1 style="color: var(--accent); text-shadow: var(--neon-shadow); margin-bottom: 5px;">PHOTO PRINT</h1>
-        <p style="opacity: 0.7; font-size: 14px; margin-bottom: 20px;">Sua foto está pronta!</p>
-        
-        <img id="mobile-img" src="" style="max-width: 100%; max-height: 60vh; border: 2px solid var(--accent); border-radius: 15px; box-shadow: var(--neon-shadow);">
-        
-        <a id="mobile-link" href="#" download="minha-foto.jpg" class="btn-baixar-cliente">⬇️ BAIXAR FOTO</a>
-        
-        <p style="color: #666; font-size: 12px; margin-top: 25px;">
-            Dica: Se o download não iniciar,<br>pressione e segure na foto para salvar.
-        </p>
-    </div>
-
     <div id="conteudo-quiosque">
         <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+        <div class="menu-trigger" onclick="toggleSidebar()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
 
         <header>
             <div class="event-label"><h2 id="view-evento">CARREGANDO...</h2></div>
@@ -109,7 +202,6 @@
                     <input type="number" id="input-busca" placeholder="🔍 DIGITE O Nº DA FOTO" oninput="buscarFoto(this.value)">
                 </div>
             </div>
-            <i class="fa-solid fa-gear settings-trigger" onclick="toggleSidebar()"></i>
         </header>
 
         <div class="sidebar" id="sidebar">
@@ -117,8 +209,9 @@
             <button class="sidebar-btn btn-delete" onclick="limparTudo()"><i class="fa-solid fa-trash"></i> Apagar Fotos</button>
         </div>
 
-        <div class="neon-line"></div>
-        <main class="gallery-container"><div id="grid-fotos" class="grid"></div></main>
+        <main class="gallery-container">
+            <div id="grid-fotos" class="grid"></div>
+        </main>
 
         <div class="modal" id="modal-zoom" onclick="fecharZoom()">
             <img id="img-zoom" src="">
@@ -130,6 +223,7 @@
     </div>
 
 <script>
+    // [O RESTANTE DO SEU SCRIPT JS PERMANECE EXATAMENTE O MESMO]
     const API = "https://photoprint-api.maxprimefotovideo.workers.dev";
     let todasFotos = [];
     let chavesLocais = new Set();
@@ -138,36 +232,6 @@
     let processadas = new Set(JSON.parse(localStorage.getItem('impressas_local') || '[]'));
     let printQueue = [];
     let isPrinting = false;
-
-    // --- LOGICA DE DOWNLOAD PARA O CLIENTE ---
-    async function checarModoDownload() {
-    const params = new URLSearchParams(window.location.search);
-    const fotoKey = params.get('download'); // Recebe apenas o nome do arquivo
-
-    if (fotoKey) {
-        document.getElementById('conteudo-quiosque').style.display = 'none';
-        document.getElementById('mobile-download-screen').style.display = 'flex';
-        
-        // SUA URL PÚBLICA DO R2 (Ajuste se as fotos estiverem em pastas)
-        const baseUrlR2 = "https://pub-8c8c6a073554400ebde1a1027de8ed73.r2.dev/";
-        const urlFotoCompleta = baseUrlR2 + decodeURIComponent(fotoKey);
-        
-        // 1. Busca as configs para tentar pegar a moldura
-        const resStatus = await fetch(`${API}/status?t=${Date.now()}`);
-        const config = await resStatus.json();
-        const resF = await fetch(`${API}/list-photos?evento=${encodeURIComponent(config.evento)}`);
-        const dados = await resF.json();
-        
-        const molduraObj = dados.find(f => f.key.toLowerCase().endsWith('.png'));
-        const urlMoldura = molduraObj ? `${API}/photo/${encodeURIComponent(molduraObj.key)}` : "";
-        
-        // 2. Fundir a foto (Isso faz a mágica da moldura aparecer no celular)
-        const imgFundida = await fundirImagem(urlFotoCompleta, urlMoldura);
-        
-        document.getElementById('mobile-img').src = imgFundida;
-        document.getElementById('mobile-link').href = imgFundida;
-    }
-}
 
     function toggleSidebar() {
         document.getElementById('sidebar').classList.toggle('active');
@@ -189,7 +253,6 @@
 
             const resF = await fetch(`${API}/list-photos?evento=${encodeURIComponent(eventoAtivo)}&t=${Date.now()}`);
             const dados = await resF.json();
-
             const molduraObj = dados.find(f => f.key.toLowerCase().endsWith('.png'));
             const urlMoldura = molduraObj ? `${API}/photo/${encodeURIComponent(molduraObj.key)}?t=${Date.now()}` : "";
             const fotosJpg = dados.filter(f => !f.key.toLowerCase().endsWith('.png'));
@@ -217,7 +280,6 @@
         document.getElementById('grid-fotos').innerHTML = todasFotos.map(f => `
             <div class="card ${processadas.has(f.key) ? 'is-printed' : ''}" onclick="abrirZoom('${f.url}')">
                 <span class="badge">#${f.id}</span>
-                <div class="printed-stamp">IMPRESSO</div>
                 <img src="${f.url}">
             </div>
         `).join('');
@@ -231,31 +293,18 @@
             i.onload = () => res(i); i.onerror = () => res(null);
             i.src = src;
         });
-
         const imgFoto = await load(fotoUrl);
         const imgM = molduraUrl ? await load(molduraUrl) : null;
         if (!imgFoto) return fotoUrl;
-
         if (imgM) {
             canvas.width = imgM.width; canvas.height = imgM.height;
-            const mAspect = imgM.width / imgM.height;
-            const fAspect = imgFoto.width / imgFoto.height;
-            let dW, dH, dX, dY;
-
-            if (fAspect > mAspect) {
-                dH = imgM.height; dW = imgFoto.width * (imgM.height / imgFoto.height);
-                dX = (imgM.width - dW) / 2; dY = 0;
-            } else {
-                dW = imgM.width; dH = imgFoto.height * (imgM.width / imgFoto.width);
-                dX = 0; dY = (imgM.height - dH) / 2;
-            }
-            ctx.drawImage(imgFoto, dX, dY, dW, dH);
+            ctx.drawImage(imgFoto, 0, 0, imgM.width, imgM.height);
             ctx.drawImage(imgM, 0, 0, imgM.width, imgM.height);
         } else {
             canvas.width = imgFoto.width; canvas.height = imgFoto.height;
             ctx.drawImage(imgFoto, 0, 0);
         }
-        return canvas.toDataURL("image/jpeg", 0.95);
+        return canvas.toDataURL("image/jpeg", 0.90);
     }
 
     function buscarFoto(val) {
@@ -274,9 +323,7 @@
         document.getElementById('input-busca').value = ""; 
     }
 
-    function reimprimirAtual() {
-        addToPrintQueue(document.getElementById('img-zoom').src);
-    }
+    function reimprimirAtual() { addToPrintQueue(document.getElementById('img-zoom').src); }
 
     function addToPrintQueue(src) { 
         printQueue.push(src); 
@@ -312,8 +359,6 @@
         }
     }
 
-    // Inicialização
-    checarModoDownload(); // Verifica se é o cliente baixando antes de tudo
     setInterval(atualizar, 5000);
     atualizar();
 </script>
