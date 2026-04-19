@@ -12,8 +12,7 @@
         }
 
         body { 
-            margin: 0; 
-            padding: 0; 
+            margin: 0; padding: 0; 
             background-color: var(--bg); 
             background: radial-gradient(circle at 50% -20%, #1a3a12 0%, #000 80%);
             overflow: hidden; 
@@ -22,147 +21,80 @@
         }
         
         header { 
-            position: absolute;
-            top: 40px;
-            left: 40px;
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            border-left: 4px solid var(--neon);
-            padding-left: 15px;
+            position: absolute; top: 40px; left: 40px; z-index: 100;
+            display: flex; flex-direction: column; align-items: flex-start;
+            border-left: 4px solid var(--neon); padding-left: 15px;
         }
 
         .brand-box h1 { 
-            margin: 0; 
-            font-size: 28px; 
-            color: var(--neon); 
-            font-weight: 900; 
-            letter-spacing: 4px; 
-            text-transform: uppercase;
-            text-shadow: 0 0 15px rgba(57, 255, 20, 0.5);
-            line-height: 1;
+            margin: 0; font-size: 28px; color: var(--neon); 
+            font-weight: 900; letter-spacing: 4px; text-transform: uppercase;
+            text-shadow: 0 0 15px rgba(57, 255, 20, 0.5); line-height: 1;
         }
         .brand-box p { 
-            margin: 5px 0 0; 
-            font-size: 10px; 
-            color: #666; 
-            letter-spacing: 3px; 
-            font-weight: bold; 
-            text-transform: uppercase; 
+            margin: 5px 0 0; font-size: 10px; color: #666; 
+            letter-spacing: 3px; font-weight: bold; text-transform: uppercase; 
         }
 
         #display {
-            width: 100vw;
-            height: calc(100vh - 140px); 
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 100vw; height: calc(100vh - 140px); 
+            position: relative; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
         }
 
         .slide-container {
-            position: absolute;
-            inset: 0; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 1.5s ease-in-out;
+            position: absolute; inset: 0; 
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 1.5s ease-in-out;
         }
 
         .active { opacity: 1; }
 
         .slide-bg {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter: blur(50px) brightness(0.4);
-            transform: scale(1.1);
-            z-index: 1;
+            position: absolute; width: 100%; height: 100%;
+            object-fit: cover; filter: blur(50px) brightness(0.4);
+            transform: scale(1.1); z-index: 1;
         }
 
         .slide-main {
-            position: relative;
-            max-width: 92%;
-            max-height: 92%;
-            object-fit: contain;
-            z-index: 2;
+            position: relative; max-width: 92%; max-height: 92%;
+            object-fit: contain; z-index: 2;
             box-shadow: 0 0 80px rgba(0,0,0,0.9);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 4px;
         }
 
         #sponsor-bar {
-            width: 100vw;
-            height: 140px;
-            background: rgba(0, 0, 0, 0.85);
-            border-top: 1px solid var(--border);
-            position: absolute;
-            bottom: 0;
-            display: flex;
-            align-items: center;
-            justify-content: space-around; 
-            padding: 10px 60px;
-            box-sizing: border-box;
-            z-index: 200;
+            width: 100vw; height: 140px; background: rgba(0, 0, 0, 0.85);
+            border-top: 1px solid var(--border); position: absolute; bottom: 0;
+            display: flex; align-items: center; justify-content: space-around; 
+            padding: 10px 60px; box-sizing: border-box; z-index: 200;
             backdrop-filter: blur(10px);
         }
 
-        .sponsor-logo {
-            max-height: 90px;
-            max-width: calc(100% / 5 - 30px); 
-            object-fit: contain;
-        }
-
+        .sponsor-logo { max-height: 90px; max-width: calc(100% / 5 - 30px); object-fit: contain; }
         .sponsor-label {
-            color: var(--neon);
-            font-size: 9px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            position: absolute;
-            top: 12px;
-            left: 30px;
-            font-weight: bold;
-            opacity: 0.5;
+            color: var(--neon); font-size: 9px; text-transform: uppercase;
+            letter-spacing: 3px; position: absolute; top: 12px; left: 30px;
+            font-weight: bold; opacity: 0.5;
         }
 
         .config-trigger {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            width: 20px;
-            height: 20px;
-            border: 1px solid rgba(57, 255, 20, 0.3);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--neon);
-            font-size: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            opacity: 0.4;
-            transition: 0.3s;
+            position: absolute; top: 10px; right: 15px; width: 20px; height: 20px;
+            border: 1px solid rgba(57, 255, 20, 0.3); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--neon); font-size: 10px; font-weight: bold;
+            cursor: pointer; opacity: 0.4; transition: 0.3s;
         }
 
         #waiting-msg { 
-            color: var(--neon); 
-            font-size: 24px; 
-            text-transform: uppercase; 
-            letter-spacing: 10px; 
-            position: absolute; 
-            z-index: 10;
+            color: var(--neon); font-size: 24px; text-transform: uppercase; 
+            letter-spacing: 10px; position: absolute; z-index: 10; text-align: center;
         }
-
-        #logo-upload { display: none; }
     </style>
 </head>
 <body>
 
-<input type="file" id="logo-upload" multiple accept="image/*">
+<input type="file" id="logo-upload" multiple accept="image/*" style="display:none">
 
 <header>
     <div class="brand-box">
@@ -172,7 +104,7 @@
 </header>
 
 <div id="display">
-    <div id="waiting-msg">Aguardando Evento Ativo...</div>
+    <div id="waiting-msg">Sincronizando Sistema...</div>
 </div>
 
 <div id="sponsor-bar">
@@ -189,9 +121,10 @@
     let currentIndex = 0;
     let slideInterval = null;
 
-    const fileInput = document.getElementById('logo-upload');
     const containerLogos = document.getElementById('logos-container');
+    const fileInput = document.getElementById('logo-upload');
 
+    // Gerenciamento de Logos (Parceiros)
     fileInput.addEventListener('change', function() {
         const files = Array.from(this.files).slice(0, 5); 
         const logosData = [];
@@ -215,104 +148,122 @@
         containerLogos.appendChild(img);
     }
 
-    async function syncEvent() {
+    // SINCRONIZAÇÃO DE EVENTO E FOTOS
+    async function sync() {
         try {
-            const res = await fetch(`${API_URL}/status?t=${Date.now()}`);
-            const data = await res.json();
+            // 1. Checa Status do Evento
+            const resStatus = await fetch(`${API_URL}/status?t=${Date.now()}`);
+            const dataStatus = await resStatus.json();
             
-            // Se o evento mudou ou foi ativado
-            if (data.evento && data.evento !== eventoAtivo) {
-                eventoAtivo = data.evento;
-                document.getElementById('waiting-msg').style.display = 'none';
-                fotos = [];
-                currentIndex = 0;
-                await updatePhotos(); // Espera a primeira busca
-            } else if (!data.evento) {
-                eventoAtivo = "";
-                document.getElementById('waiting-msg').style.display = 'block';
-                document.getElementById('waiting-msg').innerText = "Aguardando Evento Ativo...";
-                // Limpa o slide atual se o evento for desativado
-                const display = document.getElementById('display');
-                const slides = display.querySelectorAll('.slide-container');
-                slides.forEach(s => s.remove());
-                clearInterval(slideInterval);
-                slideInterval = null;
-            }
-        } catch (e) { console.error("Erro ao sincronizar status"); }
-    }
+            if (dataStatus.evento) {
+                if (dataStatus.evento !== eventoAtivo) {
+                    eventoAtivo = dataStatus.evento;
+                    fotos = []; // Reseta fotos para o novo evento
+                    currentIndex = 0;
+                }
 
-    async function updatePhotos() {
-        if (!eventoAtivo) return;
-        try {
-            // Adicionado timestamp para evitar cache do 404
-            const res = await fetch(`${API_URL}/list-photos?evento=${encodeURIComponent(eventoAtivo)}&t=${Date.now()}`);
-            const novasFotos = await res.json();
-            
-            if (Array.isArray(novasFotos) && novasFotos.length > 0) {
-                if (JSON.stringify(novasFotos) !== JSON.stringify(fotos)) {
-                    fotos = novasFotos.reverse();
-                    if (!slideInterval) {
-                        renderSlide();
-                        slideInterval = setInterval(renderSlide, 8000); 
+                // 2. Busca Fotos do Evento Ativo
+                const resFotos = await fetch(`${API_URL}/list-photos?evento=${encodeURIComponent(eventoAtivo)}&t=${Date.now()}`);
+                const novasFotos = await resFotos.json();
+                
+                if (Array.isArray(novasFotos) && novasFotos.length > 0) {
+                    document.getElementById('waiting-msg').style.display = 'none';
+                    
+                    // Só atualiza a lista se houver mudança real
+                    if (JSON.stringify(novasFotos) !== JSON.stringify(fotos)) {
+                        fotos = novasFotos.reverse(); // Fotos novas primeiro
+                        
+                        if (!slideInterval) {
+                            renderNextSlide();
+                            slideInterval = setInterval(renderNextSlide, 8000);
+                        }
                     }
+                } else {
+                    mostrarAviso("Evento sem fotos no momento...");
                 }
             } else {
-                document.getElementById('waiting-msg').style.display = 'block';
-                document.getElementById('waiting-msg').innerText = "Nenhuma foto neste evento...";
+                eventoAtivo = "";
+                mostrarAviso("Aguardando Evento Ativo...");
+                pararSlides();
             }
-        } catch (e) { console.error("Erro ao carregar fotos"); }
+        } catch (e) {
+            console.error("Erro na sincronização:", e);
+        }
     }
 
-    function renderSlide() {
+    function mostrarAviso(txt) {
+        const msg = document.getElementById('waiting-msg');
+        msg.innerText = txt;
+        msg.style.display = 'block';
+    }
+
+    function pararSlides() {
+        clearInterval(slideInterval);
+        slideInterval = null;
+        const display = document.getElementById('display');
+        const slides = display.querySelectorAll('.slide-container');
+        slides.forEach(s => s.remove());
+    }
+
+    function renderNextSlide() {
         if (fotos.length === 0) return;
         
         const display = document.getElementById('display');
         const fotoObjeto = fotos[currentIndex];
         
-        // Montagem segura da URL
-        const urlFinal = `${API_URL}/photo/${encodeURIComponent(fotoObjeto.key)}`;
+        // CORREÇÃO DO 404: Garante que o caminho da foto está limpo e codificado
+        // Se a key já vier com o nome do evento, não precisa concatenar.
+        const keyLimpa = fotoObjeto.key.startsWith('/') ? fotoObjeto.key.substring(1) : fotoObjeto.key;
+        const urlFinal = `${API_URL}/photo/${encodeURIComponent(keyLimpa)}?t=${Date.now()}`;
         
         const slideContainer = document.createElement('div');
         slideContainer.className = 'slide-container';
 
-        const imgBg = new Image();
-        imgBg.crossOrigin = "anonymous";
-        imgBg.src = urlFinal;
-        imgBg.className = 'slide-bg';
-
         const imgMain = new Image();
         imgMain.crossOrigin = "anonymous";
-        imgMain.src = urlFinal;
         imgMain.className = 'slide-main';
+        
+        const imgBg = new Image();
+        imgBg.className = 'slide-bg';
 
-        // Só exibe o slide após a imagem principal carregar com sucesso
         imgMain.onload = () => {
             const oldSlides = display.querySelectorAll('.slide-container');
+            
+            imgBg.src = imgMain.src;
             slideContainer.appendChild(imgBg);
             slideContainer.appendChild(imgMain);
             display.appendChild(slideContainer);
             
             setTimeout(() => slideContainer.classList.add('active'), 100);
             
+            // Remove o slide antigo após a transição
             if (oldSlides.length > 0) {
                 setTimeout(() => { oldSlides.forEach(s => s.remove()); }, 1600);
             }
+            
             currentIndex = (currentIndex + 1) % fotos.length;
         };
 
         imgMain.onerror = () => {
-            console.error("Erro ao carregar imagem: " + urlFinal);
+            console.warn("Foto não encontrada (404), pulando...");
             currentIndex = (currentIndex + 1) % fotos.length;
-            // Pula para a próxima se der erro
+            // Se falhou, tenta a próxima foto imediatamente
+            renderNextSlide(); 
         };
+
+        imgMain.src = urlFinal;
     }
 
     window.onload = () => {
+        // Carrega logos salvos
         const saved = JSON.parse(localStorage.getItem('pp_logos') || "[]");
         saved.forEach(src => renderLogo(src));
-        syncEvent();
-        setInterval(syncEvent, 5000);
-        setInterval(updatePhotos, 15000); // Busca fotos novas a cada 15 seg
+        
+        // Inicia Sincronização Única
+        sync();
+        
+        // Intervalo de sincronização (Checa se há fotos novas a cada 10s)
+        setInterval(sync, 10000);
     };
 </script>
 </body>
