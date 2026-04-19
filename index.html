@@ -113,9 +113,8 @@
 
         .btn span { font-size: 1.8rem; filter: drop-shadow(0 0 5px var(--neon)); }
 
-        /* --- BOTÃO VOLTAR (SETINHA) --- */
         #back-to-login {
-            display: none; /* Escondido por padrão */
+            display: none;
             position: fixed;
             bottom: 30px;
             left: 30px;
@@ -172,7 +171,7 @@
         <div class="subtitle">colecionando momentos</div>
 
         <div class="container">
-            <a href="index" class="btn" target="_blank"><span>📸</span> <div>INDEX CELULAR <small style="display:block; opacity:0.5; font-size:10px">Captura Mobile</small></div></a>
+            <a href="celular.html" class="btn" target="_blank"><span>📸</span> <div>INDEX CELULAR <small style="display:block; opacity:0.5; font-size:10px">Captura Mobile</small></div></a>
             <a href="painel" class="btn" target="_blank"><span>⚙️</span> <div>PAINEL CONTROLE <small style="display:block; opacity:0.5; font-size:10px">Configuração Global</small></div></a>
             <a href="quiosque" class="btn" target="_blank"><span>🔍</span> <div>QUIOSQUE BUSCA <small style="display:block; opacity:0.5; font-size:10px">Interface Local</small></div></a>
             <a href="galeria" class="btn" target="_blank"><span>🖼️</span> <div>GALERIA CLIENTE <small style="display:block; opacity:0.5; font-size:10px">Download & QR</small></div></a>
@@ -186,18 +185,16 @@
             if(pass === "1234") { 
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('hub-content').style.display = 'flex';
-                document.getElementById('back-to-login').style.display = 'block'; // Mostra a seta
+                document.getElementById('back-to-login').style.display = 'block';
             } else {
                 alert("ACESSO NEGADO");
             }
         }
 
         function logout() {
-            // Limpa o campo de senha
             document.getElementById('pass').value = "";
-            // Alterna as telas
             document.getElementById('hub-content').style.display = 'none';
-            document.getElementById('back-to-login').style.display = 'none'; // Esconde a seta
+            document.getElementById('back-to-login').style.display = 'none';
             document.getElementById('login-screen').style.display = 'flex';
             document.getElementById('pass').focus();
         }
