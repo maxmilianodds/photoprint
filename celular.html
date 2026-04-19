@@ -97,10 +97,7 @@
     <script>
         const API = "https://photoprint-api.maxprimefotovideo.workers.dev";
         let ev = ""; let frame = ""; let pics = []; let total = 1; let stream = null; 
-        let cancelado = false; 
-        
-        // CORREÇÃO: Inicia agora pela câmera traseira (environment)
-        let currentFacingMode = "environment"; 
+        let cancelado = false; let currentFacingMode = "user"; 
         
         const FORMATOS = {
             "TIRINHA": { w: 600, h: 1800, fotos: 3, landscape: false, padX: 0, padY: 2, divider: true },
@@ -151,27 +148,16 @@
         async function startStream(mode) {
             if (stream) { stream.getTracks().forEach(t => t.stop()); }
             try {
-                // CORREÇÃO: Melhoria na seleção de câmera
-                const constraints = {
-                    video: { 
-                        facingMode: mode, 
-                        width: { ideal: 1920 }, 
-                        height: { ideal: 1080 } 
-                    },
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: mode, width: { ideal: 1920 }, height: { ideal: 1080 } },
                     audio: false
-                };
-
-                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                });
                 const v = document.getElementById('v');
                 v.srcObject = stream;
                 v.setAttribute('playsinline', true);
                 await v.play();
-                
-                // CORREÇÃO: Aplica espelhamento apenas se for câmera frontal
                 if (mode === "user") v.classList.add('mirror'); else v.classList.remove('mirror');
-            } catch (err) { 
-                alert("Erro ao acessar a câmera. Verifique se deu permissão no navegador."); 
-            }
+            } catch (err) { alert("Câmera bloqueada ou não encontrada."); }
         }
 
         async function ligar() {
@@ -222,13 +208,7 @@
             const cv = document.getElementById('c-snap');
             cv.width = v.videoWidth; cv.height = v.videoHeight;
             const ctx = cv.getContext('2d');
-            
-            // CORREÇÃO: Captura espelhada apenas para câmera frontal
-            if (currentFacingMode === "user") { 
-                ctx.translate(cv.width, 0); 
-                ctx.scale(-1, 1); 
-            }
-            
+            if (currentFacingMode === "user") { ctx.translate(cv.width, 0); ctx.scale(-1, 1); }
             ctx.drawImage(v, 0, 0);
             const img = new Image();
             img.src = cv.toDataURL('image/jpeg', 0.95);
@@ -283,6 +263,7 @@
             
             document.getElementById('c-strip').toBlob(async b => {
                 const fd = new FormData();
+                // Adicionado campo 'tipo' e nome dinâmico para garantir o upload
                 fd.append('file', b, `foto_${Date.now()}.jpg`); 
                 fd.append('evento', ev);
                 fd.append('tipo', 'foto'); 
