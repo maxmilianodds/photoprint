@@ -19,7 +19,6 @@
         }
         .mantencao-txt { color: var(--error); font-size: 28px; font-weight: 900; text-shadow: 0 0 15px var(--error); }
 
-        /* Capa Inicial */
         .header { margin-top: 40px; z-index: 10; border-left: 4px solid var(--neon); padding-left: 20px; align-self: flex-start; margin-left: 30px; text-align: left; }
         .brand-title { font-size: 38px; font-weight: 900; color: var(--neon); text-shadow: 0 0 15px var(--neon); letter-spacing: 5px; margin: 0; text-transform: uppercase; }
         .subtitle { color: white; font-size: 14px; letter-spacing: 3px; margin-top: 5px; opacity: 0.7; font-weight: bold; text-transform: uppercase; }
@@ -35,9 +34,7 @@
         #cam-container { position: fixed; inset: 0; background: #000; display: none; z-index: 1000; }
         video { width: 100%; height: 100%; object-fit: cover; }
         
-        /* Layout do Topo na Câmera */
         #overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; padding: 20px; pointer-events: none; }
-        
         .topo-grupo { 
             background: rgba(0,0,0,0.8); 
             border: 1px solid var(--neon); 
@@ -50,31 +47,10 @@
         }
 
         #info-topo { font-size: 16px; font-weight: 900; color: var(--neon); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
-        
-        /* CONTADOR GIGANTE ABAIXO DO NOME */
-        #num-count { 
-            font-size: 80px; 
-            font-weight: 900; 
-            color: white; 
-            line-height: 1;
-            display: block;
-            text-shadow: 0 0 20px var(--neon);
-        }
-        #sub-count { 
-            font-size: 12px; 
-            font-weight: bold; 
-            color: var(--neon); 
-            text-transform: uppercase; 
-            letter-spacing: 2px;
-            opacity: 0.9;
-        }
+        #num-count { font-size: 80px; font-weight: 900; color: white; line-height: 1; display: block; text-shadow: 0 0 20px var(--neon); }
+        #sub-count { font-size: 12px; font-weight: bold; color: var(--neon); text-transform: uppercase; letter-spacing: 2px; opacity: 0.9; }
 
-        /* Controles Inferiores */
-        #cam-controls { 
-            position: absolute; bottom: 40px; left: 0; right: 0;
-            display: flex; align-items: center; justify-content: space-evenly; 
-            width: 100%; pointer-events: auto; 
-        }
+        #cam-controls { position: absolute; bottom: 40px; left: 0; right: 0; display: flex; align-items: center; justify-content: space-evenly; width: 100%; pointer-events: auto; }
         .cam-btn { width: 65px; height: 65px; background: rgba(0,0,0,0.6); border: 1px solid var(--neon); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .shutter-btn { width: 90px; height: 90px; background: black; border-radius: 50%; border: 5px solid var(--neon); cursor: pointer; box-shadow: 0 0 25px var(--neon); }
 
@@ -83,6 +59,7 @@
         .spin { width: 60px; height: 60px; border: 5px solid rgba(57, 255, 20, 0.1); border-top-color: var(--neon); border-radius: 50%; animation: s 1s linear infinite; }
         @keyframes s { to { transform: rotate(360deg); } }
         .btn-action { padding: 15px 35px; border-radius: 8px; font-weight: bold; border: none; cursor: pointer; text-transform: uppercase; }
+        @keyframes pulse-eye { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
     </style>
 </head>
 <body>
@@ -90,7 +67,7 @@
     <div id="offline-screen"><div class="mantencao-txt">SISTEMA EM MANUTENÇÃO</div></div>
     <div id="rotate-overlay"><p style="color:var(--neon);font-weight:900;">GIRE O CELULAR</p></div>
     <div id="flash"></div>
-    <div id="loader"><div class="spin"></div><p style="color:var(--neon);margin-top:20px;font-weight:bold;">PROCESSANDO...</p></div>
+    <div id="loader"><div class="spin"></div><p id="loader-text" style="color:var(--neon);margin-top:20px;font-weight:bold;">PROCESSANDO...</p></div>
 
     <div id="cam-container">
         <video id="v" autoplay playsinline muted></video>
@@ -147,8 +124,10 @@
 
                 ev = d.evento || "Geral";
                 formatStr = d.formato || "10X15 Standard";
+                const modo = (d.modo || "TRADICIONAL").toUpperCase();
+
                 document.getElementById('nome-evento-capa').innerText = ev;
-                document.getElementById('info-topo').innerText = `${ev} | ${formatStr}`;
+                document.getElementById('info-topo').innerText = `${ev} | ${formatStr} | ${modo}`;
 
                 let tipo = "10X15";
                 if (formatStr.toUpperCase().includes("TIRINHA")) tipo = "TIRINHA";
@@ -258,7 +237,7 @@
                 document.getElementById('loader').innerHTML = `
                     <img src="${cv.toDataURL('image/jpeg')}" style="max-height:60vh; border:2px solid var(--neon); box-shadow: 0 0 20px var(--neon);">
                     <div style="margin-top:25px; display:flex; gap:10px;">
-                        <button class="btn-action" style="background:var(--neon); color:black;" onclick="enviar()">IMPRIMIR</button>
+                        <button class="btn-action" style="background:var(--neon); color:black;" onclick="enviar()">GERAR FOTO</button>
                         <button class="btn-action" style="background:#333;color:white;" onclick="location.reload()">SAIR</button>
                     </div>`;
             };
@@ -266,12 +245,32 @@
         }
 
         async function enviar() {
-            document.getElementById('loader').innerHTML = '<div class="spin"></div><p style="color:var(--neon)">ENVIANDO...</p>';
+            const infoTopo = document.getElementById('info-topo').innerText;
+            const modoIA = infoTopo.includes("AVATAR");
+            
+            document.getElementById('loader').innerHTML = `<div class="spin"></div><p style="color:var(--neon)">${modoIA ? 'ENVIANDO PARA IA...' : 'ENVIANDO...'}</p>`;
+            
             document.getElementById('c-strip').toBlob(async b => {
                 const fd = new FormData();
-                fd.append('file', b, 'foto.jpg'); fd.append('evento', ev); fd.append('tipo', 'foto');
-                await fetch(`${API}/upload`, { method: 'POST', body: fd });
-                location.reload();
+                fd.append('file', b, 'foto.jpg'); 
+                fd.append('evento', ev); 
+                fd.append('tipo', modoIA ? 'avatar_bruto' : 'foto');
+
+                try {
+                    await fetch(`${API}/upload`, { method: 'POST', body: fd });
+                    
+                    if (modoIA) {
+                        document.getElementById('loader').innerHTML = `
+                            <h2 style="color:var(--neon)">SOLICITAÇÃO ENVIADA!</h2>
+                            <p style="padding:0 20px;">Seu avatar está sendo processado na central e aparecerá na galeria em breve.</p>
+                            <button class="btn-action" style="background:var(--neon); color:black;" onclick="location.reload()">NOVA FOTO</button>`;
+                    } else {
+                        location.reload();
+                    }
+                } catch (e) {
+                    alert("Erro ao enviar. Tente novamente.");
+                    location.reload();
+                }
             }, 'image/jpeg');
         }
 
